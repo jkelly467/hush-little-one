@@ -1,0 +1,49 @@
+HUSH LITTLE ONE
+
+Luke 21:20-24
+
+Zones:
+
+Field - Tall grass/Stone walls
+Forest - Underbrush/ Trees
+Mountain - Deep snow/ Caves
+Water areas in all zones
+
+AI:
+
+Enemies have sight radius/hearing radius
+
+Enemies:
+
+Soldiers FiFoMo
+Commanders (horse) FiFoMo
+Imps FoMo
+Hell Hound FoMo
+Golem Mo
+Demons Mo
+
+Bosses:
+
+Demon Lord Danza - Field
+Cerberos - Forest
+The Abomination - Mountain
+Random chance of Sinistar
+
+Items:
+
+Permanent items:
+Waterskin:
+Small food
+Poison food
+Large food
+
+One use items:
+Divine Swiftness
+Passage stone
+Oil of vanishing (invisibility for turns)
+Shroud of shadows (invisibility until you move)
+Bell of Unsounding (silence for turns)
+Shroud of Deafening (silence until you move)
+
+Boss pass items:
+Something
