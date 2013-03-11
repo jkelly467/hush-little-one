@@ -1,0 +1,13 @@
+body,
+html {
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+  font-family: Arial;
+  font-size: 20px;
+}
+#cr-stage {
+  border: 2px solid #000;
+  margin: 5px auto;
+  color: #fff;
+}

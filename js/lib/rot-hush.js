@@ -1,4 +1,4 @@
-Array.prototype.transpose = function(){
+Array.prototype.alteredTranspose = function(){
    
    var a = this,
    w = a.length ? a.length : 0,
@@ -14,6 +14,7 @@ Array.prototype.transpose = function(){
          t[i][j] = a[j][i]
       }
    }
+   t.reverse()
    return t
 }
 
@@ -604,6 +605,11 @@ ROT.RNG = {
 		return null;
 	},
 
+   getRandom: function(end, start){
+      start = start || 0
+      return Math.floor(this.getUniform()*(end-start+1)+start)
+   },
+
 	/**
 	 * Get RNG state. Useful for storing the state and re-setting it via setState.
 	 * @returns {?} Internal state
@@ -750,10 +756,13 @@ ROT.Map.DrunkardWalk = function(width, height, options) {
          E: 25,
          W: 25,
          S: 10
-      }
+      },
+      initialValue: 1,
+      target: 2
 	};
 	for (var p in options) { this._options[p] = options[p]; }
-	
+
+	this._map = this._fillMap(this._options.initialValue)
 }
 ROT.Map.DrunkardWalk.extend(ROT.Map);
 
@@ -761,9 +770,9 @@ ROT.Map.DrunkardWalk.prototype.set = function(x, y, value) {
 	this._map[x][y] = value;
 }
 
-ROT.Map.DrunkardWalk.prototype._nextIndex = function(currIndex, lastIndex){
+ROT.Map.DrunkardWalk.prototype._nextIndex = function(currIndex, lastIndex, bias){
    var rng = ROT.RNG.getPercentage()
-   var bias = this._options.bias
+   var bias = bias || this._options.bias
    if(rng < bias['N'] && currIndex['row'] < this._height-1 
         && lastIndex['row'] !== currIndex['row']+1){
       currIndex['row']++
@@ -791,7 +800,6 @@ ROT.Map.DrunkardWalk.prototype.finished = function(currIndex){
 
 ROT.Map.DrunkardWalk.prototype.create = function(callback) {
    var tmpIndex
-	this._map = this._fillMap(1);
    var index = {
       row: 0,
       col: Math.floor(ROT.RNG.getUniform()*this._width)
@@ -801,57 +809,149 @@ ROT.Map.DrunkardWalk.prototype.create = function(callback) {
       col:-1
    }
 
-   this._map[index.col][index.row] = 2
+   this._map[index.col][index.row] = this._options.target
    while(!this.finished(index)){
       tmpIndex = this._nextIndex(index, lastIndex)
       lastIndex = index
       index = tmpIndex
-      this._map[index.col][index.row] = 2
+      this._map[index.col][index.row] = this._options.target
       if(callback) callback(index)
    }
    // displayMap(this._map.transpose())
-   return this._map
 }
 
-function floodFill(map, x, y, target, replacement, maxX, maxY){
+ROT.Map.DrunkardWalk.prototype.walk = function(target, coord, steps){
+   var tmpIndex
+   var index = {
+      row: coord.h,
+      col: coord.w
+   }
+   var lastIndex = {
+      row:-1,
+      col:-1
+   }
+   while(steps--){
+      tmpIndex = this._nextIndex(index, lastIndex)
+      lastIndex = index
+      index = tmpIndex
+      if(this._map[index.col][index.row] === 2){
+         steps++
+      }else{
+         this._map[index.col][index.row] = target
+      }
+   }
+}
+
+ROT.Map.prototype.floodFill = function(x, y, target, replacement, ex){
    if(
-       map[x][y] !== target ||
-       x < 0 || y < 0 ||
-       x > maxX || y > maxY
+       x < ex.minX || y < ex.minY ||
+       x >= ex.maxX || y >= ex.maxY ||
+       this._map[x][y] !== target 
      )
    {
       return
    }
-   map[x][y] = replacement
-   floodFill(map, x-1, y, target, replacement, maxX, maxY)
-   floodFill(map, x+1, y, target, replacement, maxX, maxY)
-   floodFill(map, x, y-1, target, replacement, maxX, maxY)
-   floodFill(map, x, y+1, target, replacement, maxX, maxY)
+   this._map[x][y] = replacement
+   this.floodFill(x-1, y, target, replacement, ex)
+   this.floodFill(x+1, y, target, replacement, ex)
+   this.floodFill(x, y-1, target, replacement, ex)
+   this.floodFill(x, y+1, target, replacement, ex)
    return
 }
 
-function findMapTile(map,target){
+ROT.Map.prototype.findMapTile = function(target){
    var counter = 10000
    while(counter--){
-      var x = Math.floor(ROT.RNG.getUniform()*map.length)+1
-      var y = Math.floor(ROT.RNG.getUniform()*map[0].length)+1
-      if(map[x][y] === target){
+      var w = Math.floor(ROT.RNG.getRandom(this._width-1))
+      var h = Math.floor(ROT.RNG.getRandom(this._height-1))
+      if(this._map[w][h] === target){
          return {
-            x: x,
-            y: y
+            w: w,
+            h: h
          }
       }
    }
    return null
 }
 
-function findOpenSpace(map, side){
-   var target = findMapTile(map, 1)
-   console.log(target)
-   floodFill(map, target.x, target.y, 1, 0, target.x+side, target.y+side)
+ROT.Map.prototype.findOpenSpace = function(side, target, replacement){
+   var tile = this.findMapTile(target)
+   var ex = {
+      minX: Math.max(tile.w-side, 0),
+      maxX: Math.min(tile.w+side, this._width),
+      minY: Math.max(tile.h-side, 0),
+      maxY: Math.min(tile.h+side, this._height)
+   }
+   this.floodFill(tile.w, tile.h, target, replacement, ex)
 }
-      
-var walktest = new ROT.Map.DrunkardWalk(10,10)
-var map = walktest.create()
-findOpenSpace(map, 2)
-console.log(map)
+
+ROT.Map.prototype.getMap = function(){
+   return this._map
+}
+
+ROT.Map.prototype.findValues = function(value){
+   var i,j
+   var coords = []
+
+   for(i = 0; i < this._width; i++){
+      for(j=0;j<this._height;j++){
+         if(this._map[i][j] === value){
+            coords.push({
+               w: i,
+               h: j
+            })
+         }
+      }
+   }
+   return coords
+}
+
+ROT.Map.prototype.isSurrounded = function(w, h, target){
+   return (this._map[w+1] && this._map[w-1] &&
+           this._map[w+1][h] === target &&
+           this._map[w-1][h] === target &&
+           this._map[w][h+1] === target &&
+           this._map[w][h-1] === target)
+}
+
+ROT.Map.prototype.hollowBlocks = function(initial, target){
+   var i,coord
+   var coords = this.findValues(initial)
+   var toSwitch = []
+   var unswitched = []
+
+   for(i = 0; i < coords.length; i++){
+      coord = coords[i]
+      if(this.isSurrounded(coord.w, coord.h, initial)){
+         toSwitch.push(coord)
+      }else{
+         unswitched.push(coord)
+      }
+   } 
+
+   for(i = 0; i < toSwitch.length; i++){
+      coord = toSwitch[i]
+      this._map[coord.w][coord.h] = target
+   }
+
+   var counter = Math.floor(unswitched.length/5)
+   while(counter--){
+      i = ROT.RNG.getRandom(unswitched.length)     
+      coord = unswitched[i] 
+      if(coord){
+         this._map[coord.w][coord.h] = target
+         delete unswitched[i]
+      }else{
+         counter++
+      }
+   }
+
+}
+
+// var walktest = new ROT.Map.DrunkardWalk(20,30)
+// walktest.create()
+// walktest.findOpenSpace(2, 1, 0)
+// walktest.findOpenSpace(3, 1, 0)
+// walktest.hollowBlocks(0,1)
+// walktest.walk(3, walktest.findMapTile(1), 5)
+// console.log(walktest.getMap())
