@@ -78,7 +78,8 @@ H.Game = function() {
                case 2:
                   layTile('road',i,j)
                break
-               case 3: layTile('water',i,j)
+               case 3: 
+                  layTile('water',i,j)
                break
             }
          }
@@ -89,12 +90,14 @@ H.Game = function() {
          [Constants.MAP_WIDTH, Constants.MAP_HEIGHT], [0, Constants.MAP_HEIGHT]
       )
 
+      var startingBlock = findStartingBlock()
       hero = Crafty.e(H.Components.heroComponents.join(',')).attr({
-         x: findStartingBlock()*32,
+         x: startingBlock*32,
          y: Constants.VP_HEIGHT-32,
          z: 2
       })
-      // .controls(2, 5)
+      .onMap({w:startingBlock, y:0})
+      .controls()
       // .viewportFollow(Constants.VIEWPORT_PADDING, Constants.VIEWPORT_MAP_BOUNDS)
       
    }

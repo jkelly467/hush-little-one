@@ -6,34 +6,78 @@ H.Components = {
    heroComponents: ['2D', 
       'DOM', 
       'mother', 
+      'OnMap',
       'Controls', 
       'ViewportFollow'],
    generateComponents: function(debug){
       H.Controls()
 
       Crafty.c("Controls", {
-         _jump: null,
          init: function() {
             this.requires('CustomControls, Keyboard, Controllable')
          },
-         controls: function(speed) {
-            this.customControls(speed, {
-               RIGHT_ARROW: 0,
-               LEFT_ARROW: 180
-            })
-
-            if (speed){
-               this._speed = speed
-            }
-            
-            this.bind("EnterFrame", function() {
-               if(this._up){
-                  this.y -= this._jump
-                  this._falling = true
-               }
-            })
-
+         controls: function() {
+            this.customControls()
             return this
+         }
+      })
+
+      Crafty.c("OnMap", {
+         _currentPosition: {x:0,y:0},
+         onMap: function(position){
+            this._currentPosition = position
+         },
+         getPosition: function(){
+            return this._currentPosition
+         },
+         setPosition: function(position){
+            this._currentPosition = position
+            return this
+         }
+      })
+
+      Crafty.c("Moves", {
+         _speed: 1,
+         init: function(){
+            this.requires("OnMap")
+         },
+         moves: function(speed){
+            this._speed = speed || 1
+         },
+         checkMovement: function(x,y){
+            if(Constants.MAP[x] && Constants.MAP[x][y]){
+               switch(Constants.MAP[x][y]){
+                  case 0:
+                  case 3:
+                     return null
+                     break
+               }
+            }else{
+               return null 
+            }
+         },
+         nextMove: function(director){
+            var move, x, y, check
+            var position = this.getPosition()
+            x = position.x
+            y = position.y
+            if(typeof director === 'function'){
+               //call director to see where to go next
+            }else{
+               //otherwise director is a direction string
+               move = director
+            }
+            switch(move.toUpperCase()){
+               case "N":
+                  check = this.checkMovement(x, y-1) 
+               break
+               case "NE":
+                  check = this.checkMovement(x+1, y-1)
+               break
+               case "E":
+                  check = this.checkMovement(x+1, y)
+               break
+            }
          }
       })
 
