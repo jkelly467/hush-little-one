@@ -5,7 +5,7 @@ if(!H){
 H.Components = {
    heroComponents: ['2D', 
       'DOM', 
-      'mother', 
+      'mother',
       'OnMap',
       'Controls', 
       'ViewportFollow'],
@@ -26,6 +26,7 @@ H.Components = {
          _currentPosition: {x:0,y:0},
          onMap: function(position){
             this._currentPosition = position
+            return this
          },
          getPosition: function(){
             return this._currentPosition
@@ -33,34 +34,49 @@ H.Components = {
          setPosition: function(position){
             this._currentPosition = position
             return this
+         },
+         getTileOnMap: function(x,y){
+            return Constants.MAP[x][y]
          }
       })
 
       Crafty.c("Moves", {
-         _speed: 1,
          init: function(){
             this.requires("OnMap")
          },
-         moves: function(speed){
-            this._speed = speed || 1
+         moves: function(){
+            return this
          },
          checkMovement: function(x,y){
             if(Constants.MAP[x] && Constants.MAP[x][y]){
                switch(Constants.MAP[x][y]){
                   case 0:
                   case 3:
-                     return null
-                     break
+                     return false
+                  default:
+                     return true
                }
             }else{
-               return null 
+               return false
             }
          },
+         moveTo: function(newX,newY){
+            var from = {x:this._x, y:this._y}
+            this.x = newX*32
+            this.y = newY*32
+            this.setPosition({
+               x: newX,
+               y: newY
+            })
+            Crafty.trigger("Moved", from)
+            Crafty.trigger("Turn")
+            return this 
+         },
          nextMove: function(director){
-            var move, x, y, check
+            var move, x, y, checkX, checkY, check
             var position = this.getPosition()
-            x = position.x
-            y = position.y
+            x = checkX = position.x
+            y = checkY = position.y
             if(typeof director === 'function'){
                //call director to see where to go next
             }else{
@@ -69,14 +85,36 @@ H.Components = {
             }
             switch(move.toUpperCase()){
                case "N":
-                  check = this.checkMovement(x, y-1) 
+                  checkY--
                break
                case "NE":
-                  check = this.checkMovement(x+1, y-1)
+                  checkX++
+                  checkY--
                break
                case "E":
-                  check = this.checkMovement(x+1, y)
+                  checkX++
                break
+               case "SE":
+                  checkX++
+                  checkY++
+               break
+               case "S":
+                  checkY++
+               break
+               case "SW":
+                  checkX--
+                  checkY++
+               break
+               case "W":
+                  checkX--
+               break
+               case "NW":
+                  checkX--
+                  checkY--
+               break
+            }
+            if(this.checkMovement(checkX, checkY)){
+               this.moveTo(checkX, checkY) 
             }
          }
       })
@@ -97,7 +135,7 @@ H.Components = {
          }
       })
 
-      // H.addEnemies()
+      H.addEnemies()
       // if(debug){
       //    H.addDebugTools()
       // }

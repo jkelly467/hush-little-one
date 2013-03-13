@@ -25,19 +25,14 @@ if (!H) {
 }
 if (!Constants){
    Constants = {
-      'WIDTH':/*50*/25,
-      'HEIGHT':/*75*/25,
+      'WIDTH':50,
+      'HEIGHT':75,
       'MAP_WIDTH': 1600,
       'MAP_HEIGHT': 2400,
       'VP_WIDTH': 800,
       'VP_HEIGHT': 800,
       'MAP': [],
-      'VIEWPORT_PADDING': {
-         top: 128,
-         bottom: 128,
-         right: 128,
-         left: 128
-      } 
+      'VIEWPORT_PADDING': 64   
    }
 }
 
@@ -55,8 +50,8 @@ function layTile(tileSprite, x, y){
 }
 
 function findStartingBlock(){
-   for(var i = 0 ; i < Constants.HEIGHT; i++){
-      if(Constants.MAP[i][Constants.WIDTH-1] === 2){
+   for(var i = 0 ; i < Constants.WIDTH; i++){
+      if(Constants.MAP[i][Constants.HEIGHT-1] === 2){
          return i
       }
    }
@@ -65,9 +60,10 @@ function findStartingBlock(){
 H.Game = function() {
    var hero,i,j
    var generateWorld = function() {
+      Crafty.viewport.init(Constants.VP_WIDTH, Constants.VP_HEIGHT)
 
-      for(i = 0; i < Constants.HEIGHT; i++){
-         for(j = 0; j < Constants.WIDTH; j++){
+      for(i = 0; i < Constants.WIDTH; i++){
+         for(j = 0; j < Constants.HEIGHT; j++){
             switch(Constants.MAP[i][j]){
                case 0:
                   layTile('wall',i,j)
@@ -91,18 +87,29 @@ H.Game = function() {
       )
 
       var startingBlock = findStartingBlock()
-      hero = Crafty.e(H.Components.heroComponents.join(',')).attr({
+      Constants.HERO = Crafty.e(H.Components.heroComponents.join(',')).attr({
          x: startingBlock*32,
-         y: Constants.VP_HEIGHT-32,
+         y: (Constants.HEIGHT-1)*32,
          z: 2
       })
-      .onMap({w:startingBlock, y:0})
+      .onMap()
       .controls()
-      // .viewportFollow(Constants.VIEWPORT_PADDING, Constants.VIEWPORT_MAP_BOUNDS)
-      
+      .viewportFollow(Constants.VIEWPORT_PADDING, Constants.VIEWPORT_MAP_BOUNDS)
+      .moveTo(startingBlock, (Constants.HEIGHT-1))
+
+      for(i=0;i<6;i++){
+         H.createEnemy(2, 1,5,3,-5,5)
+      }
+      for(i=0;i<6;i++){
+         H.createEnemy(0,1,5,3,-5,5)
+      }
+      for(i=0;i<1;i++){
+         H.createEnemy(3,1,5,3,-5,5)
+      }
    }
 
-   Crafty.init(Constants.VP_WIDTH, Constants.VP_HEIGHT)
+   // Crafty.init(Constants.VP_WIDTH, Constants.VP_HEIGHT)
+   Crafty.init(Constants.MAP_WIDTH, Constants.MAP_HEIGHT)
    Crafty.scene('loading', function() {
       Crafty.load(H.config.assets, function() {
          Crafty.scene('main')
@@ -117,23 +124,24 @@ H.Game = function() {
       })
    })
    Crafty.scene('main', function() {
-      var genMap = new ROT.Map.DrunkardWalk(25,25)
+      var genMap = new ROT.Map.DrunkardWalk(50,75)
       genMap.create()
-      var counter = 6
+      var counter = 8
       while(counter--){
-         genMap.findOpenSpace(ROT.RNG.getRandom(4,1),1,0)
+         genMap.findOpenSpace(ROT.RNG.getRandom(5,2),1,0)
       }
-      counter = 3
+      counter = ROT.RNG.getRandom(7,2)
       while(counter--){
          genMap.findOpenSpace(1,1,3)
       }
       genMap.hollowBlocks(0,1)
-      counter = 3
+      counter = ROT.RNG.getRandom(10,4)
       while(counter--){
          genMap.walk(0, genMap.findMapTile(1), 5)
          genMap.walk(3, genMap.findMapTile(1), 8)
       }
 
+      Constants.MAP_OBJ = genMap
       Constants.MAP = genMap.getMap()
       H.Components.generateSprites()
       H.Components.generateComponents(true)
