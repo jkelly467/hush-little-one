@@ -6,7 +6,7 @@
  * 3: Water
  *
 */
-var H, Constants
+var H, Constants, ChildMessage
 
 var assetify = function(assetName) {
    var asset, _i, _len, _ref
@@ -32,7 +32,54 @@ if (!Constants){
       'VP_WIDTH': 800,
       'VP_HEIGHT': 800,
       'MAP': [],
-      'VIEWPORT_PADDING': 64   
+      'VIEWPORT_PADDING': 224,
+      'FUNCTIONS':{
+         lightPasses: function(x,y){
+            if(Constants.MAP[x] && Constants.MAP[x][y]){
+               return Constants.MAP[x][y] !== 0
+            }
+            return false
+         },
+         walkThrough: function(x,y){
+            if(Constants.MAP[x] && Constants.MAP[x][y]){
+               return (Constants.MAP[x][y] !== 0 && Constants.MAP[x][y] !== 3)
+            }
+            return false
+         },
+         soundPasses: function(x,y){
+            if(Constants.MAP[x] && Constants.MAP[x][y]){
+               return true
+            }
+            return false
+         },
+         randomDir: function(){
+            switch(ROT.RNG.getRandom(7)){
+               case 0:
+                  return "N"
+               case 1:
+                  return "NE"
+               case 2:
+                  return "E"
+               case 3:
+                  return "SE"
+               case 4:
+                  return "S"
+               case 5:
+                  return "SW"
+               case 6:
+                  return "W"
+               case 7:
+                  return "NW"
+            }
+         }
+      }
+   }
+}
+
+if(!ChildMessage){
+   ChildMessage = {
+      WAIT: 1,
+      COMFORT: 2
    }
 }
 
@@ -54,6 +101,28 @@ function findStartingBlock(){
       if(Constants.MAP[i][Constants.HEIGHT-1] === 2){
          return i
       }
+   }
+}
+
+function findBoyStart(coord){
+   var bad = [0,3]
+   if(bad.indexOf(Constants.MAP[coord.x+1][coord.y]) === -1){
+      coord.x++
+      return coord
+   }else if(bad.indexOf(Constants.MAP[coord.x-1][coord.y]) === -1){
+      coord.x--
+      return coord
+   }else if(bad.indexOf(Constants.MAP[coord.x][coord.y-1]) === -1){
+      coord.y--
+      return coord
+   }else if(bad.indexOf(Constants.MAP[coord.x+1][coord.y-1]) === -1){
+      coord.x++
+      coord.y--
+      return coord
+   }else if(bad.indexOf(Constants.MAP[coord.x-1][coord.y-1]) === -1){
+      coord.x--
+      coord.y--
+      return coord
    }
 }
 
@@ -86,6 +155,7 @@ H.Game = function() {
          [Constants.MAP_WIDTH, Constants.MAP_HEIGHT], [0, Constants.MAP_HEIGHT]
       )
 
+
       var startingBlock = findStartingBlock()
       Constants.HERO = Crafty.e(H.Components.heroComponents.join(',')).attr({
          x: startingBlock*32,
@@ -93,19 +163,29 @@ H.Game = function() {
          z: 2
       })
       .onMap()
-      .controls()
+      .mother()
       .viewportFollow(Constants.VIEWPORT_PADDING, Constants.VIEWPORT_MAP_BOUNDS)
-      .moveTo(startingBlock, (Constants.HEIGHT-1))
+      .moveTo(startingBlock, (Constants.HEIGHT-1), true)
 
-      for(i=0;i<6;i++){
-         H.createEnemy(2, 1,5,3,-5,5)
-      }
-      for(i=0;i<6;i++){
-         H.createEnemy(0,1,5,3,-5,5)
-      }
-      for(i=0;i<1;i++){
-         H.createEnemy(3,1,5,3,-5,5)
-      }
+       startingBlock = findBoyStart(Constants.HERO.getPosition())
+       Constants.BOY = Crafty.e('2D, DOM, boy, OnMap, Moves, Child').attr({
+         x: startingBlock.x*32,
+         y: startingBlock.y*32,
+         z:2
+       })
+       .onMap(startingBlock)
+       .moves()
+       .child(Constants.HERO)
+
+       for(i=0;i<6;i++){
+          H.createEnemy(2, 1,5,3,-5,5)
+       }
+       for(i=0;i<6;i++){
+          H.createEnemy(0,1,5,3,-5,5)
+       }
+       for(i=0;i<1;i++){
+          H.createEnemy(3,1,5,3,-5,5)
+       }
    }
 
    // Crafty.init(Constants.VP_WIDTH, Constants.VP_HEIGHT)

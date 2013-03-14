@@ -9,31 +9,38 @@ H.Controls = function(){
          switch(e.key){
             case Crafty.keys['K']:
             case Crafty.keys['UP_ARROW']:
-               this.nextMove("N")
+               this.nextMove("N",true)
             break
             case Crafty.keys['L']:
             case Crafty.keys['RIGHT_ARROW']:
-               this.nextMove("E")
+               this.nextMove("E",true)
             break
             case Crafty.keys['H']:
             case Crafty.keys['LEFT_ARROW']:
-               this.nextMove("W")
+               this.nextMove("W",true)
             break
             case Crafty.keys['J']:
             case Crafty.keys['DOWN_ARROW']:
-               this.nextMove("S")
+               this.nextMove("S",true)
             break
             case Crafty.keys['Y']:
-               this.nextMove("NW")
+               this.nextMove("NW",true)
             break
             case Crafty.keys['U']:
-               this.nextMove("NE")
+               this.nextMove("NE",true)
             break
             case Crafty.keys['B']:
-               this.nextMove("SW")
+               this.nextMove("SW",true)
             break
             case Crafty.keys['N']:
-               this.nextMove("SE")
+               this.nextMove("SE",true)
+            break
+            case Crafty.keys['PERIOD']:
+            case Crafty.keys['S']:
+               Crafty.trigger("Turn", {moved:false})
+            break
+            case Crafty.keys['T']:
+               Crafty.trigger("Turn", {moved:false, childMessage:ChildMessage.WAIT})
             break
          }
       },

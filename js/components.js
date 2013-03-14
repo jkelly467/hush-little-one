@@ -7,18 +7,26 @@ H.Components = {
       'DOM', 
       'mother',
       'OnMap',
-      'Controls', 
+      'Mother', 
       'ViewportFollow'],
    generateComponents: function(debug){
       H.Controls()
+      H.Child()
 
-      Crafty.c("Controls", {
+      Crafty.c("Mother", {
+         _child: null,
          init: function() {
             this.requires('CustomControls, Keyboard, Controllable')
          },
-         controls: function() {
+         mother: function() {
             this.customControls()
             return this
+         },
+         setChild: function(child){
+            this._child = child
+         },
+         getChild: function(){
+            return this._child
          }
       })
 
@@ -60,7 +68,7 @@ H.Components = {
                return false
             }
          },
-         moveTo: function(newX,newY){
+         moveTo: function(newX,newY,isPlayer){
             var from = {x:this._x, y:this._y}
             this.x = newX*32
             this.y = newY*32
@@ -68,17 +76,20 @@ H.Components = {
                x: newX,
                y: newY
             })
-            Crafty.trigger("Moved", from)
-            Crafty.trigger("Turn")
+            if(isPlayer){
+               Crafty.trigger("Moved", from)
+               Crafty.trigger("Turn", {moved: true})
+            }
             return this 
          },
-         nextMove: function(director){
+         nextMove: function(director, isPlayer){
             var move, x, y, checkX, checkY, check
             var position = this.getPosition()
             x = checkX = position.x
             y = checkY = position.y
             if(typeof director === 'function'){
                //call director to see where to go next
+               move = director()
             }else{
                //otherwise director is a direction string
                move = director
@@ -114,7 +125,7 @@ H.Components = {
                break
             }
             if(this.checkMovement(checkX, checkY)){
-               this.moveTo(checkX, checkY) 
+               this.moveTo(checkX, checkY, isPlayer) 
             }
          }
       })
