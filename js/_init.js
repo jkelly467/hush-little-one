@@ -33,6 +33,7 @@ if (!Constants){
       'VP_HEIGHT': 800,
       'MAP': [],
       'VIEWPORT_PADDING': 224,
+      'ENEMY_POSITIONS':{},
       'FUNCTIONS':{
          lightPasses: function(x,y){
             if(Constants.MAP[x] && Constants.MAP[x][y]){
@@ -41,6 +42,15 @@ if (!Constants){
             return false
          },
          walkThrough: function(x,y){
+            // var enemyPos
+            // var enemyInPath = false
+            // Object.keys(Constants.ENEMY_POSITIONS).forEach(function(key){
+            //    enemyPos = Constants.ENEMY_POSITIONS[key]
+            //    if(enemyPos.x === x && enemyPos.y === y){
+            //       enemyInPath = true
+            //    }
+            // })
+            // if(enemyInPath) return false
             if(Constants.MAP[x] && Constants.MAP[x][y]){
                return (Constants.MAP[x][y] !== 0 && Constants.MAP[x][y] !== 3)
             }
@@ -84,7 +94,7 @@ if(!ChildMessage){
 }
 
 H.config = {
- 'assets': ['img/tiles.png']
+ 'assets': ['img/Child.png','img/Woman.png','img/Stonewall.png','img/Ground.png','img/Pond.png','img/Shortgrass.png','img/tiles.png','img/Childdead.png','img/Womandead.png']
 }
 
 function layTile(tileSprite, x, y){
@@ -188,7 +198,6 @@ H.Game = function() {
        }
    }
 
-   // Crafty.init(Constants.VP_WIDTH, Constants.VP_HEIGHT)
    Crafty.init(Constants.MAP_WIDTH, Constants.MAP_HEIGHT)
    Crafty.scene('loading', function() {
       Crafty.load(H.config.assets, function() {

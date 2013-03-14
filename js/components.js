@@ -153,13 +153,25 @@ H.Components = {
    },
    generateSprites: function(){
       Crafty.sprite(32, assetify('tiles.png'),{
-         'grass': [0,0],
-         'wall':[0,1],
-         'road':[0,2],
-         'water':[0,3],
-         'mother':[0,4],
-         'boy':[0,5],
          'enemy':[0,6]
+      })
+      Crafty.sprite(32, assetify('Woman.png'),{
+         'mother':[0,0]
+      })
+      Crafty.sprite(32, assetify('Child.png'),{
+         'boy':[0,0]
+      })
+      Crafty.sprite(32, assetify('Stonewall.png'),{
+         'wall':[0,0]
+      })
+      Crafty.sprite(32, assetify('Ground.png'),{
+         'road':[0,0]
+      })
+      Crafty.sprite(32, assetify('Pond.png'),{
+         'water':[0,0]
+      })
+      Crafty.sprite(32, assetify('Shortgrass.png'),{
+         'grass':[0,0]
       })
    }
 }

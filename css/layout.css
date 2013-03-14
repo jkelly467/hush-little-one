@@ -7,7 +7,7 @@ html {
   font-size: 20px;
 }
 #cr-stage {
-  border: 2px solid #000;
+  border: 2px solid #444;
   margin: 5px auto;
-  color: #fff;
+  background-color: #444;
 }

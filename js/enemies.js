@@ -88,7 +88,11 @@ H.addEnemies = function(){
                this.nextMove(Constants.FUNCTIONS.randomDir(), false)
             }
          }
+         this._updatePosition()
          //check for player kill
+      },
+      _updatePosition:function(){
+         Constants.ENEMY_POSITIONS[this[0]] = this.getPosition()
       },
       _checkSense: function(x, y, r, visibility){
          var heroPos = Constants.HERO.getPosition()
