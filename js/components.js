@@ -14,19 +14,58 @@ H.Components = {
       H.Child()
 
       Crafty.c("Mother", {
+         _dead: false,
          _child: null,
+         _items: {},
          init: function() {
-            this.requires('CustomControls, Keyboard, Controllable')
+            this.requires('CustomControls, Keyboard, Controllable, OnMap')
+         },
+         _killed: function(victim){
+            if(victim === 'mother'){
+               this.removeComponent("mother").addComponent("motherdead") 
+               this.setPosition({x:-51,y:-51})
+               this._dead = true
+               Constants.DEATHINTERVAL = setInterval(function(){
+                  Crafty.trigger("Turn", {moved:false})
+               },1000)
+            }/*else if(victim === "boy"){
+               console.log("my son is dead")
+            }*/
          },
          mother: function() {
             this.customControls()
-            return this
+            return this.bind("Kill", this._killed)
          },
          setChild: function(child){
             this._child = child
          },
          getChild: function(){
             return this._child
+         },
+         _acquireItem: function(){
+            var pos = this.getPosition()
+            var item = Constants.FUNCTIONS.objInPath(Constants.ITEM_POSITIONS, pos.x, pos.y)
+         
+            if(item){
+               this._getItem(item)
+            }
+         },
+         _getItem: function(itemId){
+            itemId = Number(itemId)
+            //class name in item-ui
+            var itemName = Crafty(itemId).getName().replace(/\s/g, "").toLowerCase()
+            if(!this._items[itemName]){
+               this._items[itemName] = []
+            }
+            this._items[itemName].push(itemId)
+            H.Global.incrementItemUi(itemName)
+            Crafty(itemId).removeFromBoard()
+         },
+         useItem: function(itemName){
+            if(this._items[itemName] && this._items[itemName].length){
+               Crafty(this._items[itemName].pop()).use(this, this.getChild())
+               H.Global.decrementItemUi(itemName)
+            }
          }
       })
 
@@ -55,7 +94,19 @@ H.Components = {
          moves: function(){
             return this
          },
-         checkMovement: function(x,y){
+         checkMovement: function(x,y,isPlayer){
+            var motherPos = Constants.HERO.getPosition()
+            var boyPos = Constants.BOY.getPosition()
+            if(Constants.FUNCTIONS.objInPath(Constants.ENEMY_POSITIONS, x, y)) return false
+            if(((motherPos.x === x && motherPos.y === y) ||
+               (boyPos.x === x && boyPos.y ===y))) 
+            {
+               if(isPlayer){
+                  return "swap"
+               }else{
+                  return false
+               }
+            }
             if(Constants.MAP[x] && Constants.MAP[x][y]){
                switch(Constants.MAP[x][y]){
                   case 0:
@@ -83,18 +134,11 @@ H.Components = {
             return this 
          },
          nextMove: function(director, isPlayer){
-            var move, x, y, checkX, checkY, check
+            var x, y, checkX, checkY, check
             var position = this.getPosition()
             x = checkX = position.x
             y = checkY = position.y
-            if(typeof director === 'function'){
-               //call director to see where to go next
-               move = director()
-            }else{
-               //otherwise director is a direction string
-               move = director
-            }
-            switch(move.toUpperCase()){
+            switch(director.toUpperCase()){
                case "N":
                   checkY--
                break
@@ -124,8 +168,15 @@ H.Components = {
                   checkY--
                break
             }
-            if(this.checkMovement(checkX, checkY)){
+            var check = this.checkMovement(checkX, checkY, isPlayer)
+            if(typeof check === 'string' && check === 'swap'){
+               this.getChild().moveTo(position.x, position.y, false)
+            }
+            if(check){
                this.moveTo(checkX, checkY, isPlayer) 
+               return true
+            }else{
+               return false
             }
          }
       })
@@ -147,19 +198,28 @@ H.Components = {
       })
 
       H.addEnemies()
+      H.addItems()
       // if(debug){
       //    H.addDebugTools()
       // }
    },
    generateSprites: function(){
       Crafty.sprite(32, assetify('tiles.png'),{
-         'enemy':[0,6]
+         'enemy':[0,6],
+         'passagestone':[0,5],
+         'oilofvanishing':[0,4]
       })
       Crafty.sprite(32, assetify('Woman.png'),{
          'mother':[0,0]
       })
+      Crafty.sprite(32, assetify('Womandead.png'),{
+         'motherdead':[0,0]
+      })
       Crafty.sprite(32, assetify('Child.png'),{
          'boy':[0,0]
+      })
+      Crafty.sprite(32, assetify('Childdead.png'),{
+         'boydead':[0,0]
       })
       Crafty.sprite(32, assetify('Stonewall.png'),{
          'wall':[0,0]

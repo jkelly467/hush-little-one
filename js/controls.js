@@ -42,6 +42,16 @@ H.Controls = function(){
             case Crafty.keys['T']:
                Crafty.trigger("Turn", {moved:false, childMessage:ChildMessage.WAIT})
             break
+            case Crafty.keys["ENTER"]:
+               if(this._dead){
+                  clearInterval(Constants.DEATHINTERVAL)
+                  Constants.ENEMY_POSITIONS = {}
+                  Crafty.scene("main")
+               }    
+            break
+            case Crafty.keys["G"]:
+               this._acquireItem()
+            break
          }
       },
       customControls: function () {

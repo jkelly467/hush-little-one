@@ -16,19 +16,28 @@ H.Child = function(){
       _panicType: null,
       _panicking: false,
       _path: [],
+      _dead: false,
+      _deathCooldown: 5,
       _takeTurn: function(e){
+         if(this._dead){
+            if(this._deathCooldown){
+               this._deathCooldown--
+            }else{
+               this.setPosition({x:-50,y:-50})
+            }
+            return
+         }
          var pos = this.getPosition()
          var panicked = false
 
          this._canSeeMother = false
          Constants.FOV.compute(pos.x, pos.y, this._sight, this._checkSense.bind(this)) 
          if(!this._panicking){
-            if(this._waiting){
-               if(!this._canSeeMother){
-                  this._incrementPanic()
-                  panicked = true
-               }
-            }else if(e.moved){
+            if(!this._canSeeMother){
+               this._incrementPanic()
+               panicked = true
+            }
+            if(!this._waiting && e.moved){
                this._path = []
                var motherPos = this._mother.getPosition()
                var astar = new ROT.Path.AStar(motherPos.x, motherPos.y, Constants.FUNCTIONS.walkThrough)
@@ -128,11 +137,18 @@ H.Child = function(){
       _pathing: function(x,y){
          this._path.push({x:x, y:y})
       },
+      _killed: function(victim){
+         if(victim === 'boy'){
+            this._dead = true
+            this.removeComponent("boy").addComponent("boydead")
+         }
+      },
       child: function(mother){
          this._mother = mother
          this._mother.setChild(this)
 
          return this.bind("Turn", this._takeTurn)
+                  .bind("Kill", this._killed)
       }
    })
 }

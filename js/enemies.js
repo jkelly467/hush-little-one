@@ -11,7 +11,7 @@ H.createEnemy = function(initial, speed, sightRadius, hearingRadius, rngStart, r
    .attr({
       x: tile.x*32,
       y: tile.y*32,
-      z:2
+      z:3
    })
    .onMap(tile)
    .moves()
@@ -60,6 +60,7 @@ H.addEnemies = function(){
          Constants.FOV.compute(pos.x, pos.y, this.getHearing(), this._checkSense.bind(this))
 
          //move
+         var movementPotential = this.getSpeed()
          if(this._alerted){
             //find path toward player if player is spotted
             this._motherPath = []
@@ -73,26 +74,56 @@ H.addEnemies = function(){
             astar = new ROT.Path.AStar(boyPos.x, boyPos.y, Constants.FUNCTIONS.walkThrough)
             astar.compute(pos.x, pos.y, this._boyPathing.bind(this))
 
-            var path = (this._motherPath.length < this._boyPath.length) ? this._motherPath : this._boyPath
+            var path
+            if(!this._boyPath.length){
+               path = this._motherPath
+            }else if(!this._motherPath.length){
+               path = this._boyPath
+            }else{
+               path = (this._motherPath.length < this._boyPath.length) ? this._motherPath : this._boyPath
+            }
 
             //first coordinate returned by astar is the current enemy position
             //so we shift up one to get the next set of points
             for(i = 1 ; i < this.getSpeed()+1; i++){
-               if(path[i]){
-                  this.nextMove(this._getDirFromCoords(path[i]), false)
+               if(path[i] && this.nextMove(this._getDirFromCoords(path[i]), false)){
+                  movementPotential--
                }
             }
          }else{
             //move randomly
             for(i = 0 ; i < this.getSpeed(); i++){
-               this.nextMove(Constants.FUNCTIONS.randomDir(), false)
+               if(this.nextMove(Constants.FUNCTIONS.randomDir(), false)){
+                  movementPotential--
+               }
             }
          }
-         this._updatePosition()
-         //check for player kill
+         if(movementPotential < this.getSpeed()){
+            this._updatePosition()
+         }
+         
+         //check for kill
+         if(movementPotential){
+            var canKill = this._canKill()
+            if(canKill){
+               Crafty.trigger("Kill", canKill)
+            }
+         }
       },
       _updatePosition:function(){
          Constants.ENEMY_POSITIONS[this[0]] = this.getPosition()
+      },
+      _canKill: function(){
+         var motherPos = Constants.HERO.getPosition()
+         var boyPos = Constants.BOY.getPosition()
+         var ourPos = this.getPosition()
+
+         if(Math.abs(ourPos.x-boyPos.x) <= 1 && Math.abs(ourPos.y-boyPos.y) <=1){
+            return "boy"
+         }else if(Math.abs(ourPos.x - motherPos.x) <= 1 && Math.abs(ourPos.y-motherPos.y) <=1){
+            return "mother"
+         }
+         return null
       },
       _checkSense: function(x, y, r, visibility){
          var heroPos = Constants.HERO.getPosition()

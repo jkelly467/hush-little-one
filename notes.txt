@@ -27,7 +27,6 @@ Bosses:
 Demon Lord Danza - Field
 Cerberos - Forest
 The Abomination - Mountain
-Random chance of Sinistar
 
 Items:
 

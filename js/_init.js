@@ -34,6 +34,7 @@ if (!Constants){
       'MAP': [],
       'VIEWPORT_PADDING': 224,
       'ENEMY_POSITIONS':{},
+      'ITEM_POSITIONS':{},
       'FUNCTIONS':{
          lightPasses: function(x,y){
             if(Constants.MAP[x] && Constants.MAP[x][y]){
@@ -42,15 +43,6 @@ if (!Constants){
             return false
          },
          walkThrough: function(x,y){
-            // var enemyPos
-            // var enemyInPath = false
-            // Object.keys(Constants.ENEMY_POSITIONS).forEach(function(key){
-            //    enemyPos = Constants.ENEMY_POSITIONS[key]
-            //    if(enemyPos.x === x && enemyPos.y === y){
-            //       enemyInPath = true
-            //    }
-            // })
-            // if(enemyInPath) return false
             if(Constants.MAP[x] && Constants.MAP[x][y]){
                return (Constants.MAP[x][y] !== 0 && Constants.MAP[x][y] !== 3)
             }
@@ -61,6 +53,17 @@ if (!Constants){
                return true
             }
             return false
+         },
+         objInPath: function(obj, x,y){
+            var inPath = null
+            var pos
+            Object.keys(obj).forEach(function(key){
+               pos = obj[key]
+               if(pos.x === x && pos.y===y){
+                  inPath = key 
+               }
+            })
+            return inPath
          },
          randomDir: function(){
             switch(ROT.RNG.getRandom(7)){
@@ -80,6 +83,27 @@ if (!Constants){
                   return "W"
                case 7:
                   return "NW"
+            }
+         },
+         findBoyStart: function(coord){
+            var bad = [0,3]
+            if(bad.indexOf(Constants.MAP[coord.x+1][coord.y]) === -1){
+               coord.x++
+               return coord
+            }else if(bad.indexOf(Constants.MAP[coord.x-1][coord.y]) === -1){
+               coord.x--
+               return coord
+            }else if(bad.indexOf(Constants.MAP[coord.x][coord.y-1]) === -1){
+               coord.y--
+               return coord
+            }else if(bad.indexOf(Constants.MAP[coord.x+1][coord.y-1]) === -1){
+               coord.x++
+               coord.y--
+               return coord
+            }else if(bad.indexOf(Constants.MAP[coord.x-1][coord.y-1]) === -1){
+               coord.x--
+               coord.y--
+               return coord
             }
          }
       }
@@ -114,27 +138,6 @@ function findStartingBlock(){
    }
 }
 
-function findBoyStart(coord){
-   var bad = [0,3]
-   if(bad.indexOf(Constants.MAP[coord.x+1][coord.y]) === -1){
-      coord.x++
-      return coord
-   }else if(bad.indexOf(Constants.MAP[coord.x-1][coord.y]) === -1){
-      coord.x--
-      return coord
-   }else if(bad.indexOf(Constants.MAP[coord.x][coord.y-1]) === -1){
-      coord.y--
-      return coord
-   }else if(bad.indexOf(Constants.MAP[coord.x+1][coord.y-1]) === -1){
-      coord.x++
-      coord.y--
-      return coord
-   }else if(bad.indexOf(Constants.MAP[coord.x-1][coord.y-1]) === -1){
-      coord.x--
-      coord.y--
-      return coord
-   }
-}
 
 H.Game = function() {
    var hero,i,j
@@ -170,31 +173,35 @@ H.Game = function() {
       Constants.HERO = Crafty.e(H.Components.heroComponents.join(',')).attr({
          x: startingBlock*32,
          y: (Constants.HEIGHT-1)*32,
-         z: 2
+         z: 3
       })
       .onMap()
       .mother()
       .viewportFollow(Constants.VIEWPORT_PADDING, Constants.VIEWPORT_MAP_BOUNDS)
       .moveTo(startingBlock, (Constants.HEIGHT-1), true)
 
-       startingBlock = findBoyStart(Constants.HERO.getPosition())
+       startingBlock = Constants.FUNCTIONS.findBoyStart(Constants.HERO.getPosition())
        Constants.BOY = Crafty.e('2D, DOM, boy, OnMap, Moves, Child').attr({
          x: startingBlock.x*32,
          y: startingBlock.y*32,
-         z:2
+         z:3
        })
        .onMap(startingBlock)
        .moves()
        .child(Constants.HERO)
 
-       for(i=0;i<6;i++){
-          H.createEnemy(2, 1,5,3,-5,5)
-       }
-       for(i=0;i<6;i++){
-          H.createEnemy(0,1,5,3,-5,5)
-       }
-       for(i=0;i<1;i++){
-          H.createEnemy(3,1,5,3,-5,5)
+       // for(i=0;i<5;i++){
+       //    H.createEnemy(2, 1,5,3,-5,5)
+       // }
+       // for(i=0;i<2;i++){
+       //    H.createEnemy(0,1,5,3,-5,5)
+       // }
+       // for(i=0;i<2;i++){
+       //    H.createEnemy(3,2,6,2,-5,5)
+       // }
+
+       for(i=0;i<19;i++){
+          H.createItem(0, -1, 1)
        }
    }
 
