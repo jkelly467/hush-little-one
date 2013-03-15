@@ -54,10 +54,14 @@ H.addEnemies = function(){
          var i
          var pos = this.getPosition()
          //check sight
-         Constants.FOV.compute(pos.x, pos.y, this.getSight(), this._checkSense.bind(this))
+         if(!Constants.HERO.getInvisible()){
+            Constants.FOV.compute(pos.x, pos.y, this.getSight(), this._checkSense.bind(this))
+         }
 
          //check hearing
-         Constants.FOV.compute(pos.x, pos.y, this.getHearing(), this._checkSense.bind(this))
+         if(!Constants.HERO.getUnheard()){
+            Constants.FOV.compute(pos.x, pos.y, this.getHearing(), this._checkSense.bind(this))
+         }
 
          //move
          var movementPotential = this.getSpeed()
@@ -102,8 +106,8 @@ H.addEnemies = function(){
             this._updatePosition()
          }
          
-         //check for kill
-         if(movementPotential){
+         //check for kill but only if enemy knows player is there
+         if(movementPotential && this._alerted){
             var canKill = this._canKill()
             if(canKill){
                Crafty.trigger("Kill", canKill)

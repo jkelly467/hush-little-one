@@ -17,6 +17,11 @@ H.Components = {
          _dead: false,
          _child: null,
          _items: {},
+         _invisible: false,
+         _unheard: false,
+         _moveDeactivate: false,
+         _invisCounter: 0,
+         _silenceCounter: 0,
          init: function() {
             this.requires('CustomControls, Keyboard, Controllable, OnMap')
          },
@@ -35,12 +40,46 @@ H.Components = {
          mother: function() {
             this.customControls()
             return this.bind("Kill", this._killed)
+                     .bind("ItemUsed", this._itemEffects)
+                     .bind("Turn", this._turnUpdate)
          },
          setChild: function(child){
             this._child = child
          },
          getChild: function(){
             return this._child
+         },
+         getInvisible: function(){
+            return this._invisible
+         },
+         getUnheard: function(){
+            return this._unheard
+         },
+         _turnUpdate: function(e){
+            if(this._invisCounter < 0) this._invisCounter = 0
+            if(this._silenceCounter < 0) this._silenceCounter = 0
+
+            if(this._invisCounter){
+               this._invisCounter--   
+            }else{
+               this._invisible = false
+            }
+
+            if(this._silenceCounter){
+               this._silenceCounter--   
+            }else{
+               this._unheard = false
+            }
+
+            if(e.moved && this._moveDeactivate){
+               this._moveDeactivate = false
+               if(!this._invisCounter){
+                  this._invisible = false
+               }
+               if(!this._silenceCounter){
+                  this._unheard = false
+               }
+            }
          },
          _acquireItem: function(){
             var pos = this.getPosition()
@@ -60,6 +99,22 @@ H.Components = {
             this._items[itemName].push(itemId)
             H.Global.incrementItemUi(itemName)
             Crafty(itemId).removeFromBoard()
+         },
+         _itemEffects: function(e){
+            if(e.invisible){
+               this._invisible = true
+               if(e.turns){
+                  this._invisCounter += e.turns
+               }
+            }else if(e.unheard){
+               this._unheard = true
+               if(e.turns){
+                  this._silenceCounter += e.turns
+               }
+            }
+            if(e.moveTrigger){
+               this._moveDeactivate = true
+            }
          },
          useItem: function(itemName){
             if(this._items[itemName] && this._items[itemName].length){
@@ -207,7 +262,10 @@ H.Components = {
       Crafty.sprite(32, assetify('tiles.png'),{
          'enemy':[0,6],
          'passagestone':[0,5],
-         'oilofvanishing':[0,4]
+         'oilofvanishing':[0,4],
+         'shroudofshadows':[0,3],
+         'bellofunsounding':[0,2],
+         'shroudofdeafening':[0,1]
       })
       Crafty.sprite(32, assetify('Woman.png'),{
          'mother':[0,0]

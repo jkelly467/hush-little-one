@@ -8,12 +8,21 @@ H.createItem = function(initial, rngStart, rngEnd){
    })
 
    var type
-   switch(ROT.RNG.getRandom(1)){
+   switch(ROT.RNG.getRandom(4)){
       case 0:
          type = "PassageStone"
       break
       case 1:
          type = "OilOfVanishing"
+      break
+      case 2:
+         type = "ShroudOfShadows"
+      break
+      case 3:
+         type = "BellOfUnsounding"
+      break
+      case 4:
+         type = "ShroudOfDeafening"
       break
    }
 
@@ -53,7 +62,7 @@ H.addItems = function(){
          this.item("Passage Stone")
       },
       use: function(mother, child){
-         var loc = Constants.MAP_OBJ.placeTile(2, function(){
+         var loc = Constants.MAP_OBJ.placeTile(0, function(){
             return ROT.RNG.getRandom(3,-3)
          })
          var boyLoc = Constants.FUNCTIONS.findBoyStart(loc)
@@ -65,10 +74,52 @@ H.addItems = function(){
    Crafty.c("OilOfVanishing", {
       init: function(){
          this.requires("Item, oilofvanishing")
-         this.item("Oil Of Vanishing")
+         this.item("Oil of Vanishing")
       },
       use: function(mother, child){
-         console.log("TODO")
+         Crafty.trigger("ItemUsed", {
+            invisible: true,
+            turns: ROT.RNG.getRandom(12,5)
+         })
+      }
+   })
+
+   Crafty.c("ShroudOfShadows", {
+      init: function(){
+         this.requires("Item, shroudofshadows")
+         this.item("Shroud of Shadows")
+      },
+      use: function(mother, child){
+         Crafty.trigger("ItemUsed", {
+            invisible: true,
+            moveTrigger:true
+         })
+      }
+   })
+   
+   Crafty.c("BellOfUnsounding", {
+      init: function(){
+         this.requires("Item, bellofunsounding")
+         this.item("Bell of Unsounding")
+      },
+      use: function(mother, child){
+         Crafty.trigger("ItemUsed", {
+            unheard: true,
+            turns: ROT.RNG.getRandom(12,5)
+         })
+      }
+   })
+   
+   Crafty.c("ShroudOfDeafening", {
+      init: function(){
+         this.requires("Item, shroudofdeafening")
+         this.item("Shroud of Deafening")
+      },
+      use: function(mother, child){
+         Crafty.trigger("ItemUsed", {
+            unheard: true,
+            moveTrigger: true
+         })
       }
    })
 }
