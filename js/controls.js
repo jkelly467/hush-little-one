@@ -37,20 +37,39 @@ H.Controls = function(){
             break
             case Crafty.keys['PERIOD']:
             case Crafty.keys['S']:
-               Crafty.trigger("Turn", {moved:false})
+               if(this._choosingAction){
+                  Crafty.trigger("Turn", {moved:false, childMessage:ChildMessage.WAIT})
+                  this.speak("Stay here, little one")
+               }else{
+                  Crafty.trigger("Turn", {moved:false})
+               }
             break
             case Crafty.keys['T']:
-               Crafty.trigger("Turn", {moved:false, childMessage:ChildMessage.WAIT})
+               this._choosingAction = true
+               this.speak('What should I say?\ns:Stay\nf:Follow\nc:Comfort')
             break
             case Crafty.keys["ENTER"]:
                if(this._dead){
                   clearInterval(Constants.DEATHINTERVAL)
                   Constants.ENEMY_POSITIONS = {}
+                  H.Global.clearItemUi()
                   Crafty.scene("main")
                }    
             break
             case Crafty.keys["G"]:
                this._acquireItem()
+            break
+            case Crafty.keys["C"]:
+               if(this._choosingAction){
+                  Crafty.trigger("Turn", {moved:false, childMessage:ChildMessage.COMFORT})
+                  this.speak("Hush, little one")
+               }
+            break
+            case Crafty.keys["F"]:
+               if(this._choosingAction){
+                  Crafty.trigger("Turn", {moved:false, childMessage:ChildMessage.FOLLOW})
+                  this.speak("Stay close, little one")
+               }
             break
          }
       },

@@ -26,6 +26,10 @@ H.addEnemies = function(){
       _alerted: false,
       _motherPath: [],
       _boyPath: [],
+      _alertedCount: 0,
+      _lastKnownBoyPos: null,
+      _lastKnownMotherPos: null,
+      _offTurn: false,
       _getDirFromCoords: function(coord){
          var pos = this.getPosition()
          var diffX = coord.x - pos.x
@@ -49,10 +53,41 @@ H.addEnemies = function(){
             return "NW"
          }
       },
-      _takeTurn: function(){
-         this._alerted = false
+      generatedNoiseCheck: function(radius){
+         if(Constants.HERO.getUnheard()) return
+         var pos = this.getPosition()
+         Constants.FOH.compute(pos.x, pos.y, radius, this._checkSenseAlt.bind(this))
+         if(this._alerted){
+            this._alertedCount = 5
+         }
+      },
+      _takeTurn: function(e){
+         if(this._alertedCount){
+            this._alertedCount--
+         }else{
+            this._alerted = false
+            this._lastKnownMotherPos = null
+            this._lastKnownBoyPos = null
+         }
+         
+         var effectiveSpeed = this.getSpeed()
          var i
          var pos = this.getPosition()
+         if(e.multiplier){
+            effectiveSpeed = Math.floor(effectiveSpeed * e.multiplier)
+         }
+
+         if(effectiveSpeed === 0){
+            this._offTurn = !this._offTurn
+            if(this._offTurn){
+               return
+            }else{
+               effectiveSpeed = 1
+            }
+         }else{
+            this._offTurn = false
+         }
+
          //check sight
          if(!Constants.HERO.getInvisible()){
             Constants.FOV.compute(pos.x, pos.y, this.getSight(), this._checkSense.bind(this))
@@ -64,13 +99,13 @@ H.addEnemies = function(){
          }
 
          //move
-         var movementPotential = this.getSpeed()
+         var movementPotential = effectiveSpeed 
          if(this._alerted){
             //find path toward player if player is spotted
             this._motherPath = []
             this._boyPath = []
-            var heroPos = Constants.HERO.getPosition()
-            var boyPos = Constants.BOY.getPosition()
+            var heroPos = this._lastKnownMotherPos || Constants.HERO.getPosition()
+            var boyPos = this._lastKnownBoyPos || Constants.BOY.getPosition()
 
             var astar = new ROT.Path.AStar(heroPos.x, heroPos.y, Constants.FUNCTIONS.walkThrough)
             astar.compute(pos.x, pos.y, this._motherPathing.bind(this))
@@ -89,20 +124,20 @@ H.addEnemies = function(){
 
             //first coordinate returned by astar is the current enemy position
             //so we shift up one to get the next set of points
-            for(i = 1 ; i < this.getSpeed()+1; i++){
+            for(i = 1 ; i < effectiveSpeed+1; i++){
                if(path[i] && this.nextMove(this._getDirFromCoords(path[i]), false)){
                   movementPotential--
                }
             }
          }else{
             //move randomly
-            for(i = 0 ; i < this.getSpeed(); i++){
+            for(i = 0 ; i < effectiveSpeed; i++){
                if(this.nextMove(Constants.FUNCTIONS.randomDir(), false)){
                   movementPotential--
                }
             }
          }
-         if(movementPotential < this.getSpeed()){
+         if(movementPotential < effectiveSpeed){
             this._updatePosition()
          }
          
@@ -128,6 +163,19 @@ H.addEnemies = function(){
             return "mother"
          }
          return null
+      },
+      _checkSenseAlt: function(x,y,r,visibility){
+         var heroPos = Constants.HERO.getPosition()
+         var boyPos = Constants.BOY.getPosition()
+         if(visibility > 0){
+            if(heroPos.x === x && heroPos.y === y){
+               this._alerted = true
+               this._lastKnownMotherPos = heroPos
+            }else if(boyPos.x === x && boyPos.y === y){
+               this._alerted = true
+               this._lastKnownBoyPos = boyPos
+            }
+         }
       },
       _checkSense: function(x, y, r, visibility){
          var heroPos = Constants.HERO.getPosition()

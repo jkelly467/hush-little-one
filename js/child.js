@@ -18,6 +18,12 @@ H.Child = function(){
       _path: [],
       _dead: false,
       _deathCooldown: 5,
+      _panicSpeech: [
+         'MOMMY!!?',
+         'WHERE ARE YOU?',
+         "I'M SCARED, MOMMY!",
+         "I DON'T SEE YOU!"
+      ],
       _takeTurn: function(e){
          if(this._dead){
             if(this._deathCooldown){
@@ -27,6 +33,7 @@ H.Child = function(){
             }
             return
          }
+         this.clearSpeech()
          var pos = this.getPosition()
          var panicked = false
 
@@ -58,6 +65,9 @@ H.Child = function(){
                case ChildMessage.COMFORT:
                   this._decrementPanic()
                break
+               case ChildMessage.FOLLOW:
+                  this._waiting = false
+               break
             }
          }
          
@@ -67,7 +77,6 @@ H.Child = function(){
          if(!panicked && this._panic > 0){
             this._decrementPanic()
          }
-         console.log(this._panic)
       },
       _incrementPanic: function(){
          if(this._panicCounter+this._basePanic+ROT.RNG.getRandom(2) > 5){
@@ -101,8 +110,16 @@ H.Child = function(){
             break
             case 2:
                //generate noise which will alert all enemies within a radius
-               console.log("WAAH")
+               this._generateNoise(10)
             break
+         }
+         this.speak(this._panicSpeech[ROT.RNG.getRandom(3)])
+      },
+      _generateNoise: function(radius){
+         var enemies = Crafty("Enemy")
+         var enemy
+         for(var i = 0; i < enemies.length; i++){
+            Crafty(enemies[i]).generatedNoiseCheck(radius)
          }
       },
       _checkSense: function(x,y,r,v){

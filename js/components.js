@@ -8,6 +8,7 @@ H.Components = {
       'mother',
       'OnMap',
       'Mother', 
+      'Speaks',
       'ViewportFollow'],
    generateComponents: function(debug){
       H.Controls()
@@ -17,11 +18,14 @@ H.Components = {
          _dead: false,
          _child: null,
          _items: {},
+         _choosingAction: false,
          _invisible: false,
          _unheard: false,
          _moveDeactivate: false,
          _invisCounter: 0,
          _silenceCounter: 0,
+         _swift: true,
+         _swiftCounter: 0,
          init: function() {
             this.requires('CustomControls, Keyboard, Controllable, OnMap')
          },
@@ -33,9 +37,9 @@ H.Components = {
                Constants.DEATHINTERVAL = setInterval(function(){
                   Crafty.trigger("Turn", {moved:false})
                },1000)
-            }/*else if(victim === "boy"){
-               console.log("my son is dead")
-            }*/
+            }else if(victim === "boy" && !this._dead){
+               this.speak("NOOOOOO!!!!")
+            }
          },
          mother: function() {
             this.customControls()
@@ -55,30 +59,89 @@ H.Components = {
          getUnheard: function(){
             return this._unheard
          },
+         getSwift: function(){
+            return this._swift
+         },
          _turnUpdate: function(e){
+            if(this.getPosition().x === Constants.GOAL.x &&
+               this.getPosition().y === Constants.GOAL.y)
+            {
+               this.speak("I win!")
+            }
+            this.clearSpeech()
+            this._choosingAction = false
             if(this._invisCounter < 0) this._invisCounter = 0
             if(this._silenceCounter < 0) this._silenceCounter = 0
+            if(this._swiftCounter < 0) this._swiftCounter = 0
 
             if(this._invisCounter){
                this._invisCounter--   
             }else{
-               this._invisible = false
+               this._endInvis()
             }
 
             if(this._silenceCounter){
                this._silenceCounter--   
             }else{
-               this._unheard = false
+               this._endSilence()
+            }
+
+            if(this._swiftCounter){
+               this._swiftCounter--   
+            }else{
+               this._endSwift()
             }
 
             if(e.moved && this._moveDeactivate){
                this._moveDeactivate = false
                if(!this._invisCounter){
-                  this._invisible = false
+                  this._endInvis()
                }
                if(!this._silenceCounter){
-                  this._unheard = false
+                  this._endSilence()
                }
+            }
+         },
+         _startInvis: function(){
+            this._invisible = true
+            this.css("opacity", "0.5")
+            if(!this.getChild()._dead){
+               this.getChild().css("opacity", "0.5")
+            }
+         },
+         _endInvis: function(){
+            this._invisible = false
+            this.css("opacity", "1")
+            if(this.getChild()){
+               this.getChild().css("opacity", "1")
+            }
+         },
+         _startSilence: function(){
+            this._unheard = true
+            this.css("border", "solid 1px #FF30FF")
+            if(!this.getChild()._dead){
+               this.getChild().css("border", "solid 1px #FF30FF")
+            }
+         },
+         _endSilence: function(){
+            this._unheard = false
+            this.css("border", "none")
+            if(this.getChild()){
+               this.getChild().css("border", "none")
+            }
+         },
+         _startSwift: function(){
+            this._swift = true
+            this.css("border", "solid 1px #FF3030")
+            if(!this.getChild()._dead){
+               this.getChild().css("border", "solid 1px #FF3030")
+            }
+         },
+         _endSwift: function(){
+            this._swift = false
+            this.css("border", "none")
+            if(this.getChild()){
+               this.getChild().css("border", "none")
             }
          },
          _acquireItem: function(){
@@ -102,15 +165,18 @@ H.Components = {
          },
          _itemEffects: function(e){
             if(e.invisible){
-               this._invisible = true
+               this._startInvis()
                if(e.turns){
                   this._invisCounter += e.turns
                }
             }else if(e.unheard){
-               this._unheard = true
+               this._startSilence()
                if(e.turns){
                   this._silenceCounter += e.turns
                }
+            }else if(e.swift){
+               this._startSwift()
+               this._silenceCounter += e.turns
             }
             if(e.moveTrigger){
                this._moveDeactivate = true
@@ -121,6 +187,31 @@ H.Components = {
                Crafty(this._items[itemName].pop()).use(this, this.getChild())
                H.Global.decrementItemUi(itemName)
             }
+         }
+      })
+
+      Crafty.c("Speaks", {
+         _textBox: null,
+         init: function(){
+            this.requires("OnMap")
+            this._textBox = Crafty.e("2D, DOM, Text")
+         },
+         speak: function(words){
+            var numlines = words.split("\n").length
+            this._textBox.attr({
+               x: this._x,
+               y: this._y-(numlines*20),
+               z: 10
+            }).text(words) 
+            .textFont({size: '10px', weight: 'bold'})
+            .textColor('#DDDDDD')
+            .css({
+               'background-color': '#444',
+               'white-space': 'pre'
+            })
+         },
+         clearSpeech: function(){
+            this._textBox.text('')
          }
       })
 
@@ -183,8 +274,19 @@ H.Components = {
                y: newY
             })
             if(isPlayer){
+               var multiplier = 1
+               var oldPos = this.getPosition()
+               var hindered = Constants.MAP[oldPos.x][oldPos.y]===4
+               var swift = this.getSwift()
+              
+               if(swift && !hindered){
+                  multiplier = 0.5
+               }else if(hindered && !swift){
+                  multiplier = 2
+               }
+
                Crafty.trigger("Moved", from)
-               Crafty.trigger("Turn", {moved: true})
+               Crafty.trigger("Turn", {moved: true, multiplier: multiplier})
             }
             return this 
          },
@@ -265,7 +367,8 @@ H.Components = {
          'oilofvanishing':[0,4],
          'shroudofshadows':[0,3],
          'bellofunsounding':[0,2],
-         'shroudofdeafening':[0,1]
+         'shroudofdeafening':[0,1],
+         'divineswiftness': [0,0]
       })
       Crafty.sprite(32, assetify('Woman.png'),{
          'mother':[0,0]
@@ -290,6 +393,9 @@ H.Components = {
       })
       Crafty.sprite(32, assetify('Shortgrass.png'),{
          'grass':[0,0]
+      })
+      Crafty.sprite(32, assetify('Tallgrass.png'),{
+         'tallgrass':[0,0]
       })
    }
 }

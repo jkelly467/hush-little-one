@@ -2,28 +2,33 @@ if(!H){
    H = {}
 }
 
-H.createItem = function(initial, rngStart, rngEnd){
+H.createItem = function(initial, rngStart, rngEnd, hardType){
    var tile = Constants.MAP_OBJ.placeTile(initial, function(){
       return ROT.RNG.getRandom(rngEnd, rngStart) 
    })
 
-   var type
-   switch(ROT.RNG.getRandom(4)){
-      case 0:
-         type = "PassageStone"
-      break
-      case 1:
-         type = "OilOfVanishing"
-      break
-      case 2:
-         type = "ShroudOfShadows"
-      break
-      case 3:
-         type = "BellOfUnsounding"
-      break
-      case 4:
-         type = "ShroudOfDeafening"
-      break
+   var type = hardType
+   if(!type){
+      switch(ROT.RNG.getRandom(4)){
+         case 0:
+            type = "PassageStone"
+         break
+         case 1:
+            type = "OilOfVanishing"
+         break
+         case 2:
+            type = "ShroudOfShadows"
+         break
+         case 3:
+            type = "BellOfUnsounding"
+         break
+         case 4:
+            type = "ShroudOfDeafening"
+         break
+         case 4:
+            type = "DivineSwiftness"
+         break
+      }
    }
 
    return Crafty.e("2D, DOM, OnMap,"+type)
@@ -65,9 +70,24 @@ H.addItems = function(){
          var loc = Constants.MAP_OBJ.placeTile(0, function(){
             return ROT.RNG.getRandom(3,-3)
          })
-         var boyLoc = Constants.FUNCTIONS.findBoyStart(loc)
-         child.moveTo(boyLoc.x, boyLoc.y, false)
+         if(!child._dead){
+            var boyLoc = Constants.FUNCTIONS.findBoyStart(loc)
+            child.moveTo(boyLoc.x, boyLoc.y, false)
+         }
          mother.moveTo(loc.x, loc.y, true)
+      }
+   })
+
+   Crafty.c("DivineSwiftness", {
+      init: function(){
+         this.requires("Item, divineswiftness")
+         this.item("Divine Swiftness")
+      },
+      use: function(mother, child){
+         Crafty.trigger("ItemUsed", {
+            swift: true,
+            turns: ROT.RNG.getRandom(12,5)
+         })
       }
    })
 
@@ -120,6 +140,16 @@ H.addItems = function(){
             unheard: true,
             moveTrigger: true
          })
+      }
+   })
+
+   Crafty.c("HolyDagger", {
+      init: function(){
+         this.requires("Item, holydagger")
+         this.item("Holy Dagger")
+      },
+      use: function(mother, child){
+         console.log("TODO")
       }
    })
 }

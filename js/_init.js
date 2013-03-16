@@ -113,12 +113,13 @@ if (!Constants){
 if(!ChildMessage){
    ChildMessage = {
       WAIT: 1,
-      COMFORT: 2
+      COMFORT: 2,
+      FOLLOW: 3
    }
 }
 
 H.config = {
- 'assets': ['img/Child.png','img/Woman.png','img/Stonewall.png','img/Ground.png','img/Pond.png','img/Shortgrass.png','img/tiles.png','img/Childdead.png','img/Womandead.png']
+ 'assets': ['img/Child.png','img/Woman.png','img/Stonewall.png','img/Ground.png','img/Pond.png','img/Shortgrass.png','img/Tallgrass.png','img/tiles.png','img/Childdead.png','img/Womandead.png']
 }
 
 function layTile(tileSprite, x, y){
@@ -138,6 +139,13 @@ function findStartingBlock(){
    }
 }
 
+function findGoalBlock(){
+   for(var i = 0 ; i < Constants.WIDTH; i++){
+      if(Constants.MAP[i][0] === 2){
+         return i
+      }
+   }
+}
 
 H.Game = function() {
    var hero,i,j
@@ -159,6 +167,9 @@ H.Game = function() {
                case 3: 
                   layTile('water',i,j)
                break
+               case 4: 
+                  layTile('tallgrass',i,j)
+               break
             }
          }
       }
@@ -168,7 +179,10 @@ H.Game = function() {
          [Constants.MAP_WIDTH, Constants.MAP_HEIGHT], [0, Constants.MAP_HEIGHT]
       )
 
-
+      Constants.GOAL = {
+         x: findGoalBlock(),
+         y:0
+      }
       var startingBlock = findStartingBlock()
       Constants.HERO = Crafty.e(H.Components.heroComponents.join(',')).attr({
          x: startingBlock*32,
@@ -181,7 +195,7 @@ H.Game = function() {
       .moveTo(startingBlock, (Constants.HEIGHT-1), true)
 
        startingBlock = Constants.FUNCTIONS.findBoyStart(Constants.HERO.getPosition())
-       Constants.BOY = Crafty.e('2D, DOM, boy, OnMap, Moves, Child').attr({
+       Constants.BOY = Crafty.e('2D, DOM, boy, OnMap, Moves, Speaks, Child').attr({
          x: startingBlock.x*32,
          y: startingBlock.y*32,
          z:3
@@ -190,17 +204,17 @@ H.Game = function() {
        .moves()
        .child(Constants.HERO)
 
-       // for(i=0;i<5;i++){
-       //    H.createEnemy(2, 1,5,3,-5,5)
-       // }
-       // for(i=0;i<2;i++){
-       //    H.createEnemy(0,1,5,3,-5,5)
-       // }
-       // for(i=0;i<2;i++){
-       //    H.createEnemy(3,2,6,2,-5,5)
-       // }
+       for(i=0;i<6;i++){
+          H.createEnemy(2,1,5,3,-5,5)
+       }
+       for(i=0;i<2;i++){
+          H.createEnemy(0,1,5,3,-5,5)
+       }
+       for(i=0;i<2;i++){
+          H.createEnemy(3,2,6,2,-5,5)
+       }
 
-       for(i=0;i<19;i++){
+       for(i=0;i<8;i++){
           H.createItem(0, -1, 1)
        }
    }
@@ -231,6 +245,10 @@ H.Game = function() {
          genMap.findOpenSpace(1,1,3)
       }
       genMap.hollowBlocks(0,1)
+      counter = ROT.RNG.getRandom(8,5)
+      while(counter--){
+         genMap.findOpenSpace(ROT.RNG.getRandom(6,2),1,4)
+      }
       counter = ROT.RNG.getRandom(10,4)
       while(counter--){
          genMap.walk(0, genMap.findMapTile(1), 5)
