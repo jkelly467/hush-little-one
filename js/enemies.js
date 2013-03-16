@@ -2,12 +2,14 @@ if(!H){
    H = {}
 }
 
-H.createEnemy = function(initial, speed, sightRadius, hearingRadius, rngStart, rngEnd){
+H.createEnemy = function(initial, speed, sightRadius, hearingRadius, rngStart, rngEnd, sprite){
    var tile = Constants.MAP_OBJ.placeTile(initial, function(){
       return ROT.RNG.getRandom(rngEnd, rngStart) 
    }, null, 25)
 
-   return Crafty.e("2D, DOM, enemy, OnMap, Moves, Enemy")
+   sprite = sprite || 'enemy'
+
+   return Crafty.e("2D, DOM, enemy, OnMap, Moves, Enemy, "+sprite)
    .attr({
       x: tile.x*32,
       y: tile.y*32,
@@ -18,7 +20,39 @@ H.createEnemy = function(initial, speed, sightRadius, hearingRadius, rngStart, r
    .enemy(speed, sightRadius, hearingRadius)
 }
 
+H.createBoss = function(type, x, y){
+   if(x === Constants.WIDTH-1){ 
+      x -= 1
+   }
+
+   Constants.ENEMY_POSITIONS['boss1'] = {x:x, y:y}
+   Constants.ENEMY_POSITIONS['boss2'] = {x:x+1, y:y}
+   Constants.ENEMY_POSITIONS['boss3'] = {x:x, y:y+1}
+   Constants.ENEMY_POSITIONS['boss4'] = {x:x+1,y: y+1}
+   return Crafty.e("2D, DOM, OnMap, Boss, Color")
+      .attr({
+         x: x*32,
+         y: y*32,
+         w: 64,
+         h: 64,
+         z: 8
+      })
+      .color("#123456")
+}
+
 H.addEnemies = function(){
+   Crafty.c("Boss", {
+      takeDagger: function(){
+         this.setPosition({x:-101, y:-101})
+         Constants.ENEMY_POSITIONS['boss1'] = {x:-101, y:-101}
+         Constants.ENEMY_POSITIONS['boss2'] = {x:-101, y:-101}
+         Constants.ENEMY_POSITIONS['boss3'] = {x:-101, y:-101}
+         Constants.ENEMY_POSITIONS['boss4'] = {x:-101 ,y:-101}
+         this.visible = false
+      }
+   })
+
+
    Crafty.c("Enemy", {
       _speed: 1,
       _sight: 5,
@@ -208,6 +242,12 @@ H.addEnemies = function(){
       },
       getSight: function(){
          return this._sight
+      },
+      takeDagger: function(){
+         this.setPosition({x:-101, y:-101})
+         this._updatePosition()
+         this.visible = false
+         this.unbind('Turn', this._takeTurn)
       }
    })
 

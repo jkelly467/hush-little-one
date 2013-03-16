@@ -32,7 +32,7 @@ if (!Constants){
       'VP_WIDTH': 800,
       'VP_HEIGHT': 800,
       'MAP': [],
-      'VIEWPORT_PADDING': 224,
+      'VIEWPORT_PADDING': 256,
       'ENEMY_POSITIONS':{},
       'ITEM_POSITIONS':{},
       'FUNCTIONS':{
@@ -64,6 +64,30 @@ if (!Constants){
                }
             })
             return inPath
+         },
+         closestPosition: function(obj, x, y){
+            var closest, closeVal
+            var currentClosest = Infinity
+            Object.keys(obj).forEach(function(key){
+               closeVal = Math.max(Math.abs(obj[key].x-x), Math.abs(obj[key].y-y))
+               if(/^boss/.test(key) && closeVal <= 8){
+                  closest = Constants.BOSS[0]
+                  currentClosest = 0
+               }
+               if(closeVal < currentClosest){
+                  currentClosest = closeVal
+                  closest = key
+               }
+            })
+            if(typeof closest !== 'number'){
+               closest = Number(closest)
+            }
+
+            return {
+               id: closest,
+               distance: currentClosest
+            }
+
          },
          randomDir: function(){
             switch(ROT.RNG.getRandom(7)){
@@ -119,8 +143,13 @@ if(!ChildMessage){
 }
 
 H.config = {
- 'assets': ['img/Child.png','img/Woman.png','img/Stonewall.png','img/Ground.png','img/Pond.png','img/Shortgrass.png','img/Tallgrass.png','img/tiles.png','img/Childdead.png','img/Womandead.png']
-}
+ 'assets': ['img/Child.png','img/Woman.png','img/Childdead.png','img/Womandead.png','img/tiles.png',
+            'img/Stonewall.png','img/Ground.png','img/Pond.png','img/Shortgrass.png','img/Tallgrass.png',
+            'img/Forestfloor.png','img/Tree.png','img/Underbrush.png','img/Stream.png',
+            'img/Rock.png','img/Snow.png','img/Spring.png',
+            'img/bellofunsounding.png', 'img/divineswiftness.png', 'img/maskofstillness.png','img/oilofvanishment.png','img/shroudofconcealment.png','img/warpstone.png'         
+           ]
+}  
 
 function layTile(tileSprite, x, y){
    Crafty.e("2D, DOM,"+ tileSprite)
@@ -147,9 +176,8 @@ function findGoalBlock(){
    }
 }
 
-H.Game = function() {
-   var hero,i,j
-   var generateWorld = function() {
+H.GeneratorFunctions = {
+   generateField: function(){
       Crafty.viewport.init(Constants.VP_WIDTH, Constants.VP_HEIGHT)
 
       for(i = 0; i < Constants.WIDTH; i++){
@@ -162,7 +190,7 @@ H.Game = function() {
                   layTile('grass',i,j)
                break
                case 2:
-                  layTile('road',i,j)
+                  layTile('ground',i,j)
                break
                case 3: 
                   layTile('water',i,j)
@@ -195,7 +223,7 @@ H.Game = function() {
       .moveTo(startingBlock, (Constants.HEIGHT-1), true)
 
        startingBlock = Constants.FUNCTIONS.findBoyStart(Constants.HERO.getPosition())
-       Constants.BOY = Crafty.e('2D, DOM, boy, OnMap, Moves, Speaks, Child').attr({
+       Constants.BOY = Crafty.e('2D, DOM, boy, OnMap, Moves, Speaks, Child, Persist').attr({
          x: startingBlock.x*32,
          y: startingBlock.y*32,
          z:3
@@ -214,53 +242,141 @@ H.Game = function() {
           H.createEnemy(3,2,6,2,-5,5)
        }
 
-       for(i=0;i<8;i++){
+       Constants.BOSS = H.createBoss('field', Constants.GOAL.x, Constants.GOAL.y)
+
+       for(i=0;i<10;i++){
           H.createItem(0, -1, 1)
        }
+       for(i=0;i<2;i++){
+          H.createItem(0, -1, 1, 'HolyDagger')
+       }
+
+       Constants.NEXT_SCENE = 'forest'
+
+   },
+   generateForest: function(){
+      for(i = 0; i < Constants.WIDTH; i++){
+         for(j = 0; j < Constants.HEIGHT; j++){
+            switch(Constants.MAP[i][j]){
+               case 0:
+                  layTile('tree',i,j)
+               break
+               case 1:
+                  layTile('forestfloor',i,j)
+               break
+               case 2:
+                  layTile('ground',i,j)
+               break
+               case 3: 
+                  layTile('stream',i,j)
+               break
+               case 4: 
+                  layTile('underbrush',i,j)
+               break
+            }
+         }
+      }
+
+      Constants.GOAL = {
+         x: findGoalBlock(),
+         y:0
+      }
+      Crafty.viewport.reset()
+      var startingBlock = findStartingBlock()
+      Constants.HERO
+      .addComponent('ViewportFollow')
+      .viewportFollow(Constants.VIEWPORT_PADDING, Constants.VIEWPORT_MAP_BOUNDS)
+      .moveTo(startingBlock, (Constants.HEIGHT-1), true)
+
+      startingBlock = Constants.FUNCTIONS.findBoyStart(Constants.HERO.getPosition())
+      Constants.BOY.moveTo(startingBlock.x, startingBlock.y, false)
+
+      for(i=0;i<6;i++){
+         H.createEnemy(2,1,5,3,-5,5)
+      }
+      for(i=0;i<2;i++){
+         H.createEnemy(0,1,5,3,-5,5)
+      }
+      for(i=0;i<2;i++){
+         H.createEnemy(3,2,6,2,-5,5)
+      }
+
+      Constants.BOSS = H.createBoss('forest', Constants.GOAL.x, Constants.GOAL.y)
+
+      for(i=0;i<8;i++){
+         H.createItem(0, -1, 1)
+      }
+      for(i=0;i<2;i++){
+         H.createItem(0, -1, 1, 'HolyDagger')
+      }
+
+      Constants.NEXT_SCENE = 'mountain'
+   },
+   generateMountain: function(){
+      for(i = 0; i < Constants.WIDTH; i++){
+         for(j = 0; j < Constants.HEIGHT; j++){
+            switch(Constants.MAP[i][j]){
+               case 0:
+                  layTile('rock',i,j)
+               break
+               case 1:
+                  layTile('wall',i,j)
+               break
+               case 2:
+                  layTile('ground',i,j)
+               break
+               case 3: 
+                  layTile('spring',i,j)
+               break
+               case 4: 
+                  layTile('snow',i,j)
+               break
+            }
+         }
+      }
+
+      Constants.GOAL = {
+         x: findGoalBlock(),
+         y:0
+      }
+      var startingBlock = findStartingBlock()
+      Constants.HERO
+      .addComponent('ViewportFollow')
+      .viewportFollow(Constants.VIEWPORT_PADDING, Constants.VIEWPORT_MAP_BOUNDS)
+      .moveTo(startingBlock, (Constants.HEIGHT-1), true)
+      
+      startingBlock = Constants.FUNCTIONS.findBoyStart(Constants.HERO.getPosition())
+      Constants.BOY.moveTo(startingBlock.x, startingBlock.y, false)
+
+      for(i=0;i<6;i++){
+         H.createEnemy(2,1,5,3,-5,5)
+      }
+      for(i=0;i<2;i++){
+         H.createEnemy(0,1,5,3,-5,5)
+      }
+      for(i=0;i<2;i++){
+         H.createEnemy(3,2,6,2,-5,5)
+      }
+
+      Constants.BOSS = H.createBoss('mountain', Constants.GOAL.x, Constants.GOAL.y)
+
+      for(i=0;i<7;i++){
+         H.createItem(0, -1, 1)
+      }
+      for(i=0;i<1;i++){
+         H.createItem(0, -1, 1, 'HolyDagger')
+      }
+
+      Constants.NEXT_SCENE = 'ending'
    }
+}
+
+H.Game = function() {
+   var hero,i,j
 
    Crafty.init(Constants.MAP_WIDTH, Constants.MAP_HEIGHT)
-   Crafty.scene('loading', function() {
-      Crafty.load(H.config.assets, function() {
-         Crafty.scene('main')
-      })
-      Crafty.e('2D, DOM, Text').attr({
-         w: 100,
-         h: 20,
-         x: 150,
-         y: 120
-      }).text('Loading').css({
-        'text-align': 'center'
-      })
-   })
-   Crafty.scene('main', function() {
-      var genMap = new ROT.Map.DrunkardWalk(50,75)
-      genMap.create()
-      var counter = 8
-      while(counter--){
-         genMap.findOpenSpace(ROT.RNG.getRandom(5,2),1,0)
-      }
-      counter = ROT.RNG.getRandom(7,2)
-      while(counter--){
-         genMap.findOpenSpace(1,1,3)
-      }
-      genMap.hollowBlocks(0,1)
-      counter = ROT.RNG.getRandom(8,5)
-      while(counter--){
-         genMap.findOpenSpace(ROT.RNG.getRandom(6,2),1,4)
-      }
-      counter = ROT.RNG.getRandom(10,4)
-      while(counter--){
-         genMap.walk(0, genMap.findMapTile(1), 5)
-         genMap.walk(3, genMap.findMapTile(1), 8)
-      }
 
-      Constants.MAP_OBJ = genMap
-      Constants.MAP = genMap.getMap()
-      H.Components.generateSprites()
-      H.Components.generateComponents(true)
-      generateWorld()
-   })
+   H.createScenes()
    
    Crafty.scene('loading')
 }

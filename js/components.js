@@ -9,6 +9,7 @@ H.Components = {
       'OnMap',
       'Mother', 
       'Speaks',
+      'Persist',
       'ViewportFollow'],
    generateComponents: function(debug){
       H.Controls()
@@ -66,7 +67,7 @@ H.Components = {
             if(this.getPosition().x === Constants.GOAL.x &&
                this.getPosition().y === Constants.GOAL.y)
             {
-               this.speak("I win!")
+               H.Global.changeScene()
             }
             this.clearSpeech()
             this._choosingAction = false
@@ -76,19 +77,19 @@ H.Components = {
 
             if(this._invisCounter){
                this._invisCounter--   
-            }else{
+            }else if(this._invisible){
                this._endInvis()
             }
 
             if(this._silenceCounter){
                this._silenceCounter--   
-            }else{
+            }else if(this._unheard){
                this._endSilence()
             }
 
             if(this._swiftCounter){
                this._swiftCounter--   
-            }else{
+            }else if(this._swift){
                this._endSwift()
             }
 
@@ -132,17 +133,11 @@ H.Components = {
          },
          _startSwift: function(){
             this._swift = true
-            this.css("border", "solid 1px #FF3030")
-            if(!this.getChild()._dead){
-               this.getChild().css("border", "solid 1px #FF3030")
-            }
+            this.speak("Let us run, little one.")
          },
          _endSwift: function(){
             this._swift = false
-            this.css("border", "none")
-            if(this.getChild()){
-               this.getChild().css("border", "none")
-            }
+            this.speak("We must be cautious now.")
          },
          _acquireItem: function(){
             var pos = this.getPosition()
@@ -184,8 +179,10 @@ H.Components = {
          },
          useItem: function(itemName){
             if(this._items[itemName] && this._items[itemName].length){
-               Crafty(this._items[itemName].pop()).use(this, this.getChild())
-               H.Global.decrementItemUi(itemName)
+               var item = Crafty(this._items[itemName].pop())
+               var used = item.use(this, this.getChild())
+               item.removeComponent("Persist") //no longer in inventory, so it can be destroyed on scene change
+               if(used) H.Global.decrementItemUi(itemName)
             }
          }
       })
@@ -363,12 +360,25 @@ H.Components = {
    generateSprites: function(){
       Crafty.sprite(32, assetify('tiles.png'),{
          'enemy':[0,6],
-         'passagestone':[0,5],
-         'oilofvanishing':[0,4],
-         'shroudofshadows':[0,3],
-         'bellofunsounding':[0,2],
-         'shroudofdeafening':[0,1],
-         'divineswiftness': [0,0]
+         'holydagger':[0,5],
+      })
+      Crafty.sprite(32, assetify('bellofunsounding.png'),{
+         'bellofunsounding':[0,0]
+      })
+      Crafty.sprite(32, assetify('divineswiftness.png'),{
+         'divineswiftness':[0,0]
+      })
+      Crafty.sprite(32, assetify('maskofstillness.png'),{
+         'maskofstillness':[0,0]
+      })
+      Crafty.sprite(32, assetify('oilofvanishment.png'),{
+         'oilofvanishing':[0,0]
+      })
+      Crafty.sprite(32, assetify('shroudofconcealment.png'),{
+         'shroudofshadows':[0,0]
+      })
+      Crafty.sprite(32, assetify('warpstone.png'),{
+         'passagestone':[0,0]
       })
       Crafty.sprite(32, assetify('Woman.png'),{
          'mother':[0,0]
@@ -386,7 +396,7 @@ H.Components = {
          'wall':[0,0]
       })
       Crafty.sprite(32, assetify('Ground.png'),{
-         'road':[0,0]
+         'ground':[0,0]
       })
       Crafty.sprite(32, assetify('Pond.png'),{
          'water':[0,0]
@@ -396,6 +406,27 @@ H.Components = {
       })
       Crafty.sprite(32, assetify('Tallgrass.png'),{
          'tallgrass':[0,0]
+      })
+      Crafty.sprite(32, assetify('Forestfloor.png'),{
+         'forestfloor':[0,0]
+      })
+      Crafty.sprite(32, assetify('Tree.png'),{
+         'tree':[0,0]
+      })
+      Crafty.sprite(32, assetify('Underbrush.png'),{
+         'underbrush':[0,0]
+      })
+      Crafty.sprite(32, assetify('Stream.png'),{
+         'stream':[0,0]
+      })
+      Crafty.sprite(32, assetify('Rock.png'),{
+         'rock':[0,0]
+      })
+      Crafty.sprite(32, assetify('Snow.png'),{
+         'snow':[0,0]
+      })
+      Crafty.sprite(32, assetify('Spring.png'),{
+         'spring':[0,0]
       })
    }
 }

@@ -23,7 +23,7 @@ H.createItem = function(initial, rngStart, rngEnd, hardType){
             type = "BellOfUnsounding"
          break
          case 4:
-            type = "ShroudOfDeafening"
+            type = "MaskOfStillness"
          break
          case 4:
             type = "DivineSwiftness"
@@ -31,7 +31,7 @@ H.createItem = function(initial, rngStart, rngEnd, hardType){
       }
    }
 
-   return Crafty.e("2D, DOM, OnMap,"+type)
+   return Crafty.e("2D, DOM, OnMap, "+type)
    .attr({
       x: tile.x*32,
       y: tile.y*32,
@@ -57,6 +57,7 @@ H.addItems = function(){
       },
       removeFromBoard: function(){
          Constants.ITEM_POSITIONS[this[0]] = {x:-1, y:-1}
+         this.addComponent("Persist")//this inventory item needs to stick around across scenes
          this.visible = false
       }
    })
@@ -75,6 +76,7 @@ H.addItems = function(){
             child.moveTo(boyLoc.x, boyLoc.y, false)
          }
          mother.moveTo(loc.x, loc.y, true)
+         return true
       }
    })
 
@@ -88,6 +90,7 @@ H.addItems = function(){
             swift: true,
             turns: ROT.RNG.getRandom(12,5)
          })
+         return true
       }
    })
 
@@ -101,6 +104,7 @@ H.addItems = function(){
             invisible: true,
             turns: ROT.RNG.getRandom(12,5)
          })
+         return true
       }
    })
 
@@ -114,6 +118,7 @@ H.addItems = function(){
             invisible: true,
             moveTrigger:true
          })
+         return true
       }
    })
    
@@ -127,19 +132,21 @@ H.addItems = function(){
             unheard: true,
             turns: ROT.RNG.getRandom(12,5)
          })
+         return true
       }
    })
    
-   Crafty.c("ShroudOfDeafening", {
+   Crafty.c("MaskOfStillness", {
       init: function(){
-         this.requires("Item, shroudofdeafening")
-         this.item("Shroud of Deafening")
+         this.requires("Item, maskofstillness")
+         this.item("Mask of Stillness")
       },
       use: function(mother, child){
          Crafty.trigger("ItemUsed", {
             unheard: true,
             moveTrigger: true
          })
+         return true
       }
    })
 
@@ -148,8 +155,19 @@ H.addItems = function(){
          this.requires("Item, holydagger")
          this.item("Holy Dagger")
       },
+      _findClosestEnemy: function(x,y){
+         var enemyPos
+      },
       use: function(mother, child){
-         console.log("TODO")
+         var motherPos = mother.getPosition()
+         var result = Constants.FUNCTIONS.closestPosition(Constants.ENEMY_POSITIONS, motherPos.x, motherPos.y)
+         if(result.distance <= 8){
+            Crafty(result.id).takeDagger()
+            return true
+         }else{
+            mother.speak("I see no one...")
+            return false
+         }
       }
    })
 }

@@ -36,6 +36,18 @@ H.Global = function(){
          $('.item:not(.header)').each(function(){
             $(this).find('span').text("x0")
          })
+      },
+      changeScene: function(reset){
+         Constants.ENEMY_POSITIONS = {}
+         Constants.ITEM_POSITIONS = {}
+         if(reset){
+            clearInterval(Constants.DEATHINTERVAL)
+            H.Global.clearItemUi()
+            Crafty.scene("field")
+         }else{
+            Constants.HERO.removeComponent('ViewportFollow')
+            Crafty.scene(Constants.NEXT_SCENE)
+         }
       }
    }
 }()
