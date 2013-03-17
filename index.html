@@ -16,7 +16,6 @@
    <script src='js/items.js'></script>
    <script src='js/global.js'></script>
    <script src='js/scenes.js'></script>
-   <!-- <script src='js/debugTools.js'></script> -->
 </head>
 <body>
    <div class="item-ui">
@@ -53,11 +52,9 @@
       </div>
    </div>
    <div class="help-screen">
+      <h2 class='help-header'>Help</h2>
       <div class="help-section">
-         <pre>
-         HELP 
-
-         Controls: 
+         <span class='section-head'>Controls: </span>
 
          Arrow keys to move, or 8 directional movement as below:
          y  k  u
@@ -72,36 +69,50 @@
          ENTER to restart if you die
 
          Click on an item in the Items window to use it
-
-         Items:
-
-         Divine Swiftness   - Increase your movement speed
-         Passage Stone      - Passage away, but not safe passage
-         Oil of Vanishing   - Disappear for some time
-         Shroud of Shadows  - Disappear until you move
-         Bell of Unsounding - Become unheard for some time
-         Mask of Stillness  - Become unheard until you move
-         Holy Dagger        - Smite those who stand in your way. Will seek greatest evil in sight.
-
-         [ESC to return to game]
-         </pre>
       </div>
+      <div class="help-section">
+         <span class='section-head'>Items: </span>
+
+         <img src='img/divineswiftness.png'/>Divine Swiftness   - Increase your movement speed
+         <img src='img/warpstone.png'/>Passage Stone      - Passage away, but not safe passage
+         <img src='img/oilofvanishment.png'/>Oil of Vanishing   - Disappear for some time
+         <img src='img/shroudofconcealment.png'/>Shroud of Shadows  - Disappear until you move
+         <img src='img/bellofunsounding.png'/>Bell of Unsounding - Become unheard for some time
+         <img src='img/maskofstillness.png'/>Mask of Stillness  - Become unheard until you move
+         <img src='img/holydagger.png'/>Holy Dagger        - Smite those who stand in your way. Will seek greatest evil in sight.
+      </div>
+      <div class="help-section">
+         <span class='section-head'>Beastiary: </span>
+
+         <img src='img/Soldier.png'/>Soldier - A common soldier.
+         <img src='img/Captain.png'/>Captain - Commander of armies, swift in movement.
+         <img src='img/Imp.png'/>Imp - Lowest among the demonic troops, they hunt with keen eyesight, but poor hearing.
+         <img src='img/Hellhound.png'/>Hell Hound - Demon hounds bred for uncanny hearing.
+         <img src='img/Golem.png'/>Golem - A twisted creature of stone, imbued with unnatural sight.
+         <img src='img/Devil.png'/>Devil - A lord of the infernal pits; a formidable foe.
+      </div>
+      <span class='help-footer'>Press [ESC] to return to game</span>
    </div>
    <div class="opening-screen">
-      <span class="line line1">"But when you see Jerusalem surrounded by armies, then know that its desolation is near.</span>
-      <span class="line line2">Then let those who are in Judea flee to the mountains, let those who are in the midst of her depart, and let not those who are in the country enter her.</span>
-      <span class="line line3">For these are the days of vengeance, that all things which are written may be fulfilled.</span>
-      <span class="line line4">But woe to those who are pregnant and to those who are nursing babies in those days! For there will be great distress in the land and wrath upon this people."</span>
-      <span class="line line5">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;~Luke 21:20-24</span>
-      <h2 class="line title">Hush, Little One</h2>
-      <div class='ready'>Loading assets...</div>
+      <div class='active-area'>
+         <span class="line line1">"But when you see Jerusalem surrounded by armies, then know that its desolation is near.</span>
+         <span class="line line2">Then let those who are in Judea flee to the mountains, let those who are in the midst of her depart, and let not those who are in the country enter her.</span>
+         <span class="line line3">For these are the days of vengeance, that all things which are written may be fulfilled.</span>
+         <span class="line line4">But woe to those who are pregnant and to those who are nursing babies in those days! For there will be great distress in the land and wrath upon this people."</span>
+         <span class="line line5">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;~Luke 21:20-24</span>
+         <h2 class="line title">Hush, Little One</h2>
+         <div class='ready'>Loading assets...</div>
+      </div>
       <div class='credits'>
          Zer0Games is:
          Jon Kelly - Design, Programming
          Dan Kelly - Design, Art, Music
 
          Email: zer0castdoom AT gmail DOT com
-         Twitter: @zer0jon 
+         Twitter: <a target="_blank" class='twitter' href="http://twitter.com/zer0jon">@zer0jon</a>
+      </div>
+      <div class='tip'>
+         Press '?' in game for help screen
       </div>
    </div>
    <div class="ending-screen">

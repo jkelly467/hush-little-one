@@ -1,30 +1,3 @@
-Array.prototype.alteredTranspose = function(){
-   
-   var a = this,
-   w = a.length ? a.length : 0,
-   h = a[0] instanceof Array ? a[0].length : 0;
-
-   if (h===0 || w===0) {return []}
-
-   var i,j,t=[];
-
-   for(i=0;i<h;i++){
-      t[i] = []
-      for(j=0;j<w;j++){
-         t[i][j] = a[j][i]
-      }
-   }
-   t.reverse()
-   return t
-}
-
-displayMap = function(map){
-   var i = map.length
-   while(i--){
-      console.log("["+i+"]:"+map[i])
-   }
-}
-
 /*
 	This is rot.js, the ROguelike Toolkit in JavaScript.
 	Version 0.4~dev, generated on Thu Mar  7 20:57:44 CST 2013.

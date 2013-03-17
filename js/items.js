@@ -9,7 +9,7 @@ H.createItem = function(initial, rngStart, rngEnd, hardType){
 
    var type = hardType
    if(!type){
-      switch(ROT.RNG.getRandom(4)){
+      switch(ROT.RNG.getRandom(5)){
          case 0:
             type = "PassageStone"
          break
@@ -25,7 +25,7 @@ H.createItem = function(initial, rngStart, rngEnd, hardType){
          case 4:
             type = "MaskOfStillness"
          break
-         case 4:
+         case 5:
             type = "DivineSwiftness"
          break
       }
@@ -88,7 +88,7 @@ H.addItems = function(){
       use: function(mother, child){
          Crafty.trigger("ItemUsed", {
             swift: true,
-            turns: ROT.RNG.getRandom(12,5)
+            turns: ROT.RNG.getRandom(25,10)
          })
          return true
       }
@@ -102,7 +102,7 @@ H.addItems = function(){
       use: function(mother, child){
          Crafty.trigger("ItemUsed", {
             invisible: true,
-            turns: ROT.RNG.getRandom(12,5)
+            turns: ROT.RNG.getRandom(25,15)
          })
          return true
       }
@@ -130,7 +130,7 @@ H.addItems = function(){
       use: function(mother, child){
          Crafty.trigger("ItemUsed", {
             unheard: true,
-            turns: ROT.RNG.getRandom(12,5)
+            turns: ROT.RNG.getRandom(25,15)
          })
          return true
       }

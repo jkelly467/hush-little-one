@@ -39,6 +39,24 @@ html {
   z-index: 100;
   display: none;
 }
+.help-screen .help-header {
+  text-align: center;
+}
+.help-screen .help-footer {
+  display: block;
+  margin-top: 20px;
+  text-align: center;
+}
+.help-screen .help-section {
+  white-space: pre;
+  font-family: monospace;
+  display: inline-block;
+  vertical-align: top;
+}
+.help-screen .help-section .section-head {
+  color: #30ff30;
+  font-weight: bold;
+}
 .opening-screen {
   width: 100%;
   height: 100%;
@@ -57,10 +75,18 @@ html {
   display: block;
   margin: 10px 20px;
 }
+.opening-screen .active-area {
+  height: 100%;
+}
 .opening-screen .ready {
   position: absolute;
   bottom: 44%;
   right: 43%;
+}
+.opening-screen .tip {
+  position: absolute;
+  bottom: 40%;
+  right: 41%;
 }
 .opening-screen .credits {
   position: absolute;
@@ -70,6 +96,9 @@ html {
 }
 .opening-screen .title {
   text-align: center;
+}
+.opening-screen .twitter {
+  color: #86d;
 }
 .ending-screen {
   width: 100%;

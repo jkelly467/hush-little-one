@@ -8477,22 +8477,23 @@ Crafty.extend({
 			if (arguments.length === 1 && typeof id === "object") {
 				for (var i in id) {
 					for (var src in id[i]) {
-						audio = this.audioElement();
-						audio.id = i;
-						audio.preload = "auto";
-						audio.volume = Crafty.audio.volume;
-						path = id[i][src];
-						ext = path.substr(path.lastIndexOf('.') + 1).toLowerCase();
-						if (this.supported[ext]) {
-							audio.src = path;
-							Crafty.asset(path, audio);
-							this.sounds[i] = {
-								obj : audio,
-								played : 0,
-								volume : Crafty.audio.volume
-							}
-						}
-
+                  if(id[i].hasOwnProperty(src)){
+                     audio = this.audioElement();
+                     audio.id = i;
+                     audio.preload = "auto";
+                     audio.volume = Crafty.audio.volume;
+                     path = id[i][src];
+                     ext = path.substr(path.lastIndexOf('.') + 1).toLowerCase();
+                     if (this.supported[ext]) {
+                        audio.src = path;
+                        Crafty.asset(path, audio);
+                        this.sounds[i] = {
+                           obj : audio,
+                           played : 0,
+                           volume : Crafty.audio.volume
+                        }
+                     }
+                  }
 					}
 				}
 			}

@@ -214,39 +214,51 @@ H.GeneratorFunctions = {
          y:0
       }
       var startingBlock = findStartingBlock()
-      Constants.HERO = Crafty.e(H.Components.heroComponents.join(',')).attr({
-         x: startingBlock*32,
-         y: (Constants.HEIGHT-1)*32,
-         z: 3
-      })
-      .onMap()
-      .mother()
-      .viewportFollow(Constants.VIEWPORT_PADDING, Constants.VIEWPORT_MAP_BOUNDS)
-      .moveTo(startingBlock, (Constants.HEIGHT-1), true)
+      if(!Constants.HERO){
+         Constants.HERO = Crafty.e(H.Components.heroComponents.join(',')).attr({
+            x: startingBlock*32,
+            y: (Constants.HEIGHT-1)*32,
+            z: 3
+         })
+         .onMap()
+         .mother()
+      }
+      Constants.HERO
+         .addComponent('ViewportFollow')
+         .viewportFollow(Constants.VIEWPORT_PADDING, Constants.VIEWPORT_MAP_BOUNDS)
+         .moveTo(startingBlock, (Constants.HEIGHT-1), true)
 
        startingBlock = Constants.FUNCTIONS.findBoyStart(Constants.HERO.getPosition())
-       Constants.BOY = Crafty.e('2D, DOM, boy, OnMap, Moves, Speaks, Child, Persist').attr({
-         x: startingBlock.x*32,
-         y: startingBlock.y*32,
-         z:3
-       })
-       .onMap(startingBlock)
-       .moves()
-       .child(Constants.HERO)
+       if(!Constants.BOY){
+          Constants.BOY = Crafty.e('2D, DOM, boy, OnMap, Moves, Speaks, Child, Persist').attr({
+            x: startingBlock.x*32,
+            y: startingBlock.y*32,
+            z:3
+          })
+          .onMap(startingBlock)
+          .moves()
+          .child(Constants.HERO)
+       }else{
+          Constants.BOY.moveTo(startingBlock.x, startingBlock.y, false)
+       }
 
-       for(i=0;i<4;i++){
+       var counter = ROT.RNG.getRandom(5,3)
+       while(counter--){
           H.createEnemy(2,1,5,3,-5,5,'soldier')
        }
-       for(i=0;i<2;i++){
+       counter = ROT.RNG.getRandom(3,1)
+       while(counter--){
           H.createEnemy(0,1,5,3,-5,5,'soldier')
        }
-       for(i=0;i<2;i++){
+       counter = ROT.RNG.getRandom(2,1)
+       while(counter--){
           H.createEnemy(3,2,6,2,-5,5,'captain')
        }
 
        Constants.BOSS = H.createBoss('danza', Constants.GOAL.x, Constants.GOAL.y)
 
-       for(i=0;i<10;i++){
+       counter = ROT.RNG.getRandom(12,9)
+       while(counter--){
           H.createItem(0, -1, 1)
        }
        for(i=0;i<2;i++){
@@ -298,26 +310,31 @@ H.GeneratorFunctions = {
       }else{
          Constants.BOY.visible = false
       }
-
-      for(i=0;i<2;i++){
+      var counter = ROT.RNG.getRandom(2)
+      while(counter--){
          H.createEnemy(2,1,5,3,-5,5,'soldier')
       }
-      for(i=0;i<3;i++){
+      counter = ROT.RNG.getRandom(4,2)
+      while(counter--){
          H.createEnemy(0,1,6,1,-5,5,'imp')
       }
-      for(i=0;i<2;i++){
+      counter = ROT.RNG.getRandom(4,1)
+      while(counter--){
          H.createEnemy(2,1,6,1,-5,5,'imp')
       }
-      for(i=0;i<1;i++){
+      counter = ROT.RNG.getRandom(1)
+      while(counter--){
          H.createEnemy(1,2,6,2,-5,5,'captain')
       }
-      for(i=0;i<2;i++){
+      counter = ROT.RNG.getRandom(4,1)
+      while(counter--){
          H.createEnemy(3,2,2,7,-5,5,'hellhound')
       }
 
       Constants.BOSS = H.createBoss('cerberus', Constants.GOAL.x, Constants.GOAL.y)
 
-      for(i=0;i<9;i++){
+      counter = ROT.RNG.getRandom(10,7)
+      while(counter--){
          H.createItem(0, -1, 1)
       }
       for(i=0;i<2;i++){
@@ -368,31 +385,39 @@ H.GeneratorFunctions = {
          Constants.BOY.visible = false
       }
 
-      for(i=0;i<1;i++){
+      var counter = ROT.RNG.getRandom(2)
+      while(counter--){
          H.createEnemy(2,1,5,3,-5,5,'soldier')
       }
-      for(i=0;i<2;i++){
+      counter = ROT.RNG.getRandom(2,1)
+      while(counter--){
          H.createEnemy(0,1,6,1,-5,5,'imp')
       }
-      for(i=0;i<1;i++){
+      counter = ROT.RNG.getRandom(1)
+      while(counter--){
          H.createEnemy(1,2,6,2,-5,5,'captain')
       }
-      for(i=0;i<2;i++){
+      counter = ROT.RNG.getRandom(2,1)
+      while(counter--){
          H.createEnemy(0,2,2,7,-5,5,'hellhound')
       }
-      for(i=0;i<2;i++){
+      counter = ROT.RNG.getRandom(3,1)
+      while(counter--){
          H.createEnemy(0,2,8,1,-5,5,'golem')
       }
-      for(i=0;i<2;i++){
+      counter = ROT.RNG.getRandom(2,1)
+      while(counter--){
          H.createEnemy(2,2,8,1,-5,5,'golem')
       }
-      for(i=0;i<2;i++){
+      counter = ROT.RNG.getRandom(3,1)
+      while(counter--){
          H.createEnemy(1,2,8,5,-5,5,'devil')
       }
 
       Constants.BOSS = H.createBoss('abomination', Constants.GOAL.x, Constants.GOAL.y)
 
-      for(i=0;i<7;i++){
+      counter = ROT.RNG.getRandom(8,6)
+      while(counter--){
          H.createItem(0, -1, 1)
       }
       for(i=0;i<1;i++){

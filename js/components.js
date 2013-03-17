@@ -9,8 +9,7 @@ H.Components = {
       'OnMap',
       'Mother', 
       'Speaks',
-      'Persist',
-      'ViewportFollow'],
+      'Persist'],
    generateComponents: function(){
       H.Controls()
       H.Child()
@@ -78,29 +77,23 @@ H.Components = {
             if(this._invisCounter){
                this._invisCounter--   
             }else if(this._invisible){
-               this._endInvis()
+               if((this._moveDeactivate && e.moved) || !this._moveDeactivate){
+                  this._endInvis()
+               }
             }
 
             if(this._silenceCounter){
                this._silenceCounter--   
             }else if(this._unheard){
-               this._endSilence()
+               if((this._moveDeactivate && e.moved) || !this._moveDeactivate){
+                  this._endSilence()
+               }
             }
 
             if(this._swiftCounter){
                this._swiftCounter--   
             }else if(this._swift){
                this._endSwift()
-            }
-
-            if(e.moved && this._moveDeactivate){
-               this._moveDeactivate = false
-               if(!this._invisCounter){
-                  this._endInvis()
-               }
-               if(!this._silenceCounter){
-                  this._endSilence()
-               }
             }
          },
          _startInvis: function(){
@@ -112,6 +105,7 @@ H.Components = {
          },
          _endInvis: function(){
             this._invisible = false
+            this._moveDeactivate = false
             this.css("opacity", "1")
             if(this.getChild()){
                this.getChild().css("opacity", "1")
@@ -126,6 +120,7 @@ H.Components = {
          },
          _endSilence: function(){
             this._unheard = false
+            this._moveDeactivate = false
             this.css("border", "none")
             if(this.getChild()){
                this.getChild().css("border", "none")
@@ -171,7 +166,7 @@ H.Components = {
                }
             }else if(e.swift){
                this._startSwift()
-               this._silenceCounter += e.turns
+               this._swiftCounter += e.turns
             }
             if(e.moveTrigger){
                this._moveDeactivate = true
@@ -191,7 +186,7 @@ H.Components = {
          _textBox: null,
          init: function(){
             this.requires("OnMap")
-            this._textBox = Crafty.e("2D, DOM, Text")
+            this._textBox = Crafty.e("2D, DOM, Text, Persist")
          },
          speak: function(words){
             var numlines = words.split("\n").length
@@ -355,9 +350,11 @@ H.Components = {
       H.addItems()
    },
    generateAudio: function(){
-     Crafty.audio.add('fieldMusic',['audio/Ruhefeld.ogg','audio/Ruhefeld.mp3']) 
-     Crafty.audio.add('forestMusic',['audio/Greyewood.ogg','audio/Greyewood.mp3']) 
-     Crafty.audio.add('mountainMusic',['audio/Eldermountain.ogg','audio/Eldermountain.mp3']) 
+     Crafty.audio.add({
+        fieldMusic:['audio/Ruhefeld.ogg','audio/Ruhefeld.mp3'],
+        forestMusic:['audio/Greyewood.ogg','audio/Greyewood.mp3'],
+        mountainMusic:['audio/Eldermountain.ogg','audio/Eldermountain.mp3'] 
+     })
    },
    generateSprites: function(){
       Crafty.sprite(32, assetify('bellofunsounding.png'),{

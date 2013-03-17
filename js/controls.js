@@ -37,6 +37,8 @@ H.Controls = function(){
                   this.nextMove("SE",true)
                break
                case Crafty.keys['PERIOD']:
+                  Crafty.trigger("Turn", {moved:false})
+               break
                case Crafty.keys['S']:
                   if(this._choosingAction){
                      Crafty.trigger("Turn", {moved:false, childMessage:ChildMessage.WAIT})

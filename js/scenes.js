@@ -24,7 +24,7 @@ H.createScenes = function(){
          })
       })
 
-      $('.opening-screen').on('click', function(){
+      $('.active-area').on('click', function(){
          $('.ready').text("Generating map...")
          Crafty.scene('field')
       })
@@ -50,7 +50,7 @@ H.createScenes = function(){
          genMap.findOpenSpace(ROT.RNG.getRandom(6,2),1,4)
       }
       //jags of water and wall
-      counter = ROT.RNG.getRandom(10,4)
+      counter = ROT.RNG.getRandom(12,7)
       while(counter--){
          genMap.walk(0, genMap.findMapTile(1), ROT.RNG.getRandom(8,5))
          genMap.walk(3, genMap.findMapTile(1), ROT.RNG.getRandom(9,6))
@@ -99,7 +99,7 @@ H.createScenes = function(){
       var counter = 20
       //wall blocks
       while(counter--){
-         genMap.findOpenSpace(ROT.RNG.getRandom(4,2),1,0)
+         genMap.findOpenSpace(ROT.RNG.getRandom(5,2),1,0)
       }
       //water blocks
       counter = ROT.RNG.getRandom(3)
@@ -113,7 +113,7 @@ H.createScenes = function(){
          genMap.findOpenSpace(ROT.RNG.getRandom(6,3),1,4)
       }
       //jags of wall
-      counter = ROT.RNG.getRandom(15,8)
+      counter = ROT.RNG.getRandom(16,9)
       while(counter--){
          genMap.walk(0, genMap.findMapTile(1), ROT.RNG.getRandom(15,7))
       }

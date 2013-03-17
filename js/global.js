@@ -34,6 +34,10 @@ H.Global = function(){
             Crafty.audio.stop(Constants.CURRENT_SCENE+"Music")
             Constants.HERO.removeComponent('ViewportFollow')
             if(reset){
+               Constants.HERO.removeComponent("Persist")
+               Constants.BOY.removeComponent("Persist")
+               Constants.HERO = null
+               Constants.BOY = null
                clearInterval(Constants.DEATHINTERVAL)
                H.Global.clearItemUi()
                Crafty.scene("field")
