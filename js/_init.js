@@ -143,11 +143,13 @@ if(!ChildMessage){
 }
 
 H.config = {
- 'assets': ['img/Child.png','img/Woman.png','img/Childdead.png','img/Womandead.png','img/tiles.png',
+ 'assets': ['img/Child.png','img/Woman.png','img/Childdead.png','img/Womandead.png',
+            'img/Soldier.png','img/Captain.png','img/Hellhound.png','img/Imp.png','img/Devil.png','img/Golem.png',
             'img/Stonewall.png','img/Ground.png','img/Pond.png','img/Shortgrass.png','img/Tallgrass.png',
             'img/Forestfloor.png','img/Tree.png','img/Underbrush.png','img/Stream.png',
             'img/Rock.png','img/Snow.png','img/Spring.png',
-            'img/bellofunsounding.png', 'img/divineswiftness.png', 'img/maskofstillness.png','img/oilofvanishment.png','img/shroudofconcealment.png','img/warpstone.png'         
+            'img/bellofunsounding.png', 'img/divineswiftness.png', 'img/maskofstillness.png','img/oilofvanishment.png','img/shroudofconcealment.png','img/warpstone.png','img/holydagger.png',
+            'img/Danza.png','img/Cerberus.png','img/Abomination.png'
            ]
 }  
 
@@ -232,17 +234,17 @@ H.GeneratorFunctions = {
        .moves()
        .child(Constants.HERO)
 
-       for(i=0;i<6;i++){
-          H.createEnemy(2,1,5,3,-5,5)
+       for(i=0;i<4;i++){
+          H.createEnemy(2,1,5,3,-5,5,'soldier')
        }
        for(i=0;i<2;i++){
-          H.createEnemy(0,1,5,3,-5,5)
+          H.createEnemy(0,1,5,3,-5,5,'soldier')
        }
        for(i=0;i<2;i++){
-          H.createEnemy(3,2,6,2,-5,5)
+          H.createEnemy(3,2,6,2,-5,5,'captain')
        }
 
-       Constants.BOSS = H.createBoss('field', Constants.GOAL.x, Constants.GOAL.y)
+       Constants.BOSS = H.createBoss('danza', Constants.GOAL.x, Constants.GOAL.y)
 
        for(i=0;i<10;i++){
           H.createItem(0, -1, 1)
@@ -251,7 +253,9 @@ H.GeneratorFunctions = {
           H.createItem(0, -1, 1, 'HolyDagger')
        }
 
+       Constants.CURRENT_SCENE = 'field'
        Constants.NEXT_SCENE = 'forest'
+       Crafty.audio.play("fieldMusic",-1)
 
    },
    generateForest: function(){
@@ -288,29 +292,41 @@ H.GeneratorFunctions = {
       .viewportFollow(Constants.VIEWPORT_PADDING, Constants.VIEWPORT_MAP_BOUNDS)
       .moveTo(startingBlock, (Constants.HEIGHT-1), true)
 
-      startingBlock = Constants.FUNCTIONS.findBoyStart(Constants.HERO.getPosition())
-      Constants.BOY.moveTo(startingBlock.x, startingBlock.y, false)
+      if(!Constants.BOY._dead){
+         startingBlock = Constants.FUNCTIONS.findBoyStart(Constants.HERO.getPosition())
+         Constants.BOY.moveTo(startingBlock.x, startingBlock.y, false)
+      }else{
+         Constants.BOY.visible = false
+      }
 
-      for(i=0;i<6;i++){
-         H.createEnemy(2,1,5,3,-5,5)
+      for(i=0;i<2;i++){
+         H.createEnemy(2,1,5,3,-5,5,'soldier')
+      }
+      for(i=0;i<3;i++){
+         H.createEnemy(0,1,6,1,-5,5,'imp')
       }
       for(i=0;i<2;i++){
-         H.createEnemy(0,1,5,3,-5,5)
+         H.createEnemy(2,1,6,1,-5,5,'imp')
+      }
+      for(i=0;i<1;i++){
+         H.createEnemy(1,2,6,2,-5,5,'captain')
       }
       for(i=0;i<2;i++){
-         H.createEnemy(3,2,6,2,-5,5)
+         H.createEnemy(3,2,2,7,-5,5,'hellhound')
       }
 
-      Constants.BOSS = H.createBoss('forest', Constants.GOAL.x, Constants.GOAL.y)
+      Constants.BOSS = H.createBoss('cerberus', Constants.GOAL.x, Constants.GOAL.y)
 
-      for(i=0;i<8;i++){
+      for(i=0;i<9;i++){
          H.createItem(0, -1, 1)
       }
       for(i=0;i<2;i++){
          H.createItem(0, -1, 1, 'HolyDagger')
       }
 
+      Constants.CURRENT_SCENE = 'forest'
       Constants.NEXT_SCENE = 'mountain'
+      Crafty.audio.play("forestMusic",-1)
    },
    generateMountain: function(){
       for(i = 0; i < Constants.WIDTH; i++){
@@ -345,20 +361,36 @@ H.GeneratorFunctions = {
       .viewportFollow(Constants.VIEWPORT_PADDING, Constants.VIEWPORT_MAP_BOUNDS)
       .moveTo(startingBlock, (Constants.HEIGHT-1), true)
       
-      startingBlock = Constants.FUNCTIONS.findBoyStart(Constants.HERO.getPosition())
-      Constants.BOY.moveTo(startingBlock.x, startingBlock.y, false)
-
-      for(i=0;i<6;i++){
-         H.createEnemy(2,1,5,3,-5,5)
-      }
-      for(i=0;i<2;i++){
-         H.createEnemy(0,1,5,3,-5,5)
-      }
-      for(i=0;i<2;i++){
-         H.createEnemy(3,2,6,2,-5,5)
+      if(!Constants.BOY._dead){
+         startingBlock = Constants.FUNCTIONS.findBoyStart(Constants.HERO.getPosition())
+         Constants.BOY.moveTo(startingBlock.x, startingBlock.y, false)
+      }else{
+         Constants.BOY.visible = false
       }
 
-      Constants.BOSS = H.createBoss('mountain', Constants.GOAL.x, Constants.GOAL.y)
+      for(i=0;i<1;i++){
+         H.createEnemy(2,1,5,3,-5,5,'soldier')
+      }
+      for(i=0;i<2;i++){
+         H.createEnemy(0,1,6,1,-5,5,'imp')
+      }
+      for(i=0;i<1;i++){
+         H.createEnemy(1,2,6,2,-5,5,'captain')
+      }
+      for(i=0;i<2;i++){
+         H.createEnemy(0,2,2,7,-5,5,'hellhound')
+      }
+      for(i=0;i<2;i++){
+         H.createEnemy(0,2,8,1,-5,5,'golem')
+      }
+      for(i=0;i<2;i++){
+         H.createEnemy(2,2,8,1,-5,5,'golem')
+      }
+      for(i=0;i<2;i++){
+         H.createEnemy(1,2,8,5,-5,5,'devil')
+      }
+
+      Constants.BOSS = H.createBoss('abomination', Constants.GOAL.x, Constants.GOAL.y)
 
       for(i=0;i<7;i++){
          H.createItem(0, -1, 1)
@@ -366,8 +398,60 @@ H.GeneratorFunctions = {
       for(i=0;i<1;i++){
          H.createItem(0, -1, 1, 'HolyDagger')
       }
-
+      
+      Constants.CURRENT_SCENE = 'mountain'
       Constants.NEXT_SCENE = 'ending'
+      Crafty.audio.play("mountainMusic",-1)
+   },
+   generateEnding: function(){
+      for(i = 0; i < 35; i++){
+         for(j = 0; j < 35; j++){
+            switch(Constants.MAP[i][j]){
+               case 0:
+                  layTile('wall',i,j)
+               break
+               case 1:
+                  layTile('grass',i,j)
+               break
+               case 2:
+                  layTile('ground',i,j)
+               break
+               case 3: 
+                  layTile('pond',i,j)
+               break
+               case 4: 
+                  layTile('tree',i,j)
+               break
+            }
+         }
+      }
+
+      var startingBlock = Constants.MAP_OBJ.findMapTile(1)
+      var boydead = Constants.BOY._dead
+      Crafty.audio.play("fieldMusic",-1)
+
+      Constants.HERO
+      .addComponent('ViewportFollow')
+      .viewportFollow(Constants.VIEWPORT_PADDING, Constants.VIEWPORT_MAP_BOUNDS)
+      .moveTo(startingBlock.w, startingBlock.h, true)
+      
+      if(!boydead){
+         startingBlock = Constants.FUNCTIONS.findBoyStart(Constants.HERO.getPosition())
+         Constants.BOY.moveTo(startingBlock.x, startingBlock.y, false)
+         $('.ending-screen').css("background-color","rgba(0,0,255,0)")
+      }else{
+         Constants.BOY.visible = false
+         $('.ending-screen').css("background-color","rgba(0,0,255,0.1)")
+      }
+     
+      $('.ending-screen').show()
+      var opProp = {opacity:1}
+      var optLine = function(){
+         $('.eline2').animate(opProp,2000,'linear')
+      }
+      setTimeout(function(){
+         $('.eline1').animate(opProp,2000,'linear',boydead ? optLine : function(){})
+      },3000)
    }
 }
 

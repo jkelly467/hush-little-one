@@ -1086,6 +1086,28 @@ ROT.Map.Cellular.prototype._getNeighbors = function(cx, cy) {
 	return result;
 }
 
+/**
+ * @class Simple empty rectangular room
+ * @augments ROT.Map
+ */
+ROT.Map.Arena = function(width, height) {
+	ROT.Map.call(this, width, height);
+   this._map = this._fillMap(1)
+}
+ROT.Map.Arena.extend(ROT.Map);
+
+ROT.Map.Arena.prototype.create = function(callback) {
+	var w = this._width-1;
+	var h = this._height-1;
+	for (var i=0;i<=w;i++) {
+		for (var j=0;j<=h;j++) {
+			var empty = (i && j && i<w && j<h);
+         this._map[i][j] = empty ? 0 : 1
+		}
+	}
+	return this;
+}
+
 ROT.Map.DrunkardWalk = function(width, height, options) {
 	ROT.Map.call(this, width, height);
 	this._options = {
@@ -1155,7 +1177,6 @@ ROT.Map.DrunkardWalk.prototype.create = function(callback) {
       this._map[index.col][index.row] = this._options.target
       if(callback) callback(index)
    }
-   // displayMap(this._map.transpose())
 }
 
 ROT.Map.DrunkardWalk.prototype.walk = function(target, coord, steps){
@@ -1210,6 +1231,11 @@ ROT.Map.prototype.findMapTile = function(target, maxWidth, maxHeight){
       }
    }
    return null
+}
+
+ROT.Map.prototype.placeMapTile = function(initial, target, maxWidth, maxHeight){
+   var tile = this.findMapTile(initial, maxWidth, maxHeight)
+   this._map[tile.w][tile.h] = target
 }
 
 ROT.Map.prototype.findOpenSpace = function(side, target, replacement){
@@ -1306,15 +1332,3 @@ ROT.Map.prototype.placeTile = function(initial, randomizer, maxWidth, maxHeight)
       y: h
    }
 }
-
-// var walktest = new ROT.Map.DrunkardWalk(20,30)
-// walktest.create()
-// walktest.findOpenSpace(2, 1, 0)
-// walktest.findOpenSpace(3, 1, 0)
-// walktest.hollowBlocks(0,1)
-// walktest.walk(3, walktest.findMapTile(1), 5)
-
-// console.log(walktest.getMap())
-// console.log(walktest.placeTile(2, function(){
-//    return ROT.RNG.getRandom(2, -2)
-// }))

@@ -5,15 +5,28 @@ if(!H){
 H.createScenes = function(){
    Crafty.scene('loading', function() {
       Crafty.load(H.config.assets, function() {
-         Crafty.scene('field')
+         H.Components.generateSprites()
+         H.Components.generateComponents()
+         H.Components.generateAudio()
+         $('.ready').text("Click anywhere to begin")
       })
-      Crafty.e('2D, DOM, Text').attr({
-         w: 100,
-         h: 20,
-         x: 150,
-         y: 120
-      }).text('Loading').css({
-        'text-align': 'center'
+      var opProp = {'opacity':1}
+
+      $('.line1').animate(opProp, 2000, 'linear', function(){
+         $('.line2').animate(opProp,2000, 'linear', function(){
+            $('.line3').animate(opProp,2000,'linear',function(){
+               $('.line4').animate(opProp,2000,'linear',function(){
+                  $('.line5').animate(opProp,2000,'linear',function(){
+                     $('.title').animate(opProp,2000,'linear')
+                  })
+               })
+            })
+         })
+      })
+
+      $('.opening-screen').on('click', function(){
+         $('.ready').text("Generating map...")
+         Crafty.scene('field')
       })
    })
 
@@ -45,8 +58,7 @@ H.createScenes = function(){
 
       Constants.MAP_OBJ = genMap
       Constants.MAP = genMap.getMap()
-      H.Components.generateSprites()
-      H.Components.generateComponents(true)
+      $('.opening-screen').hide()
       H.GeneratorFunctions.generateField()
    })
 
@@ -117,14 +129,26 @@ H.createScenes = function(){
    })
 
    Crafty.scene('ending', function(){
-      Crafty.e('2D, DOM, Text').attr({
-         w: 100,
-         h: 20,
-         x: 150,
-         y: 120
-      }).text('You Win!').css({
-        'text-align': 'center'
-      })
+      var tile
+      var genMap = new ROT.Map.DrunkardWalk(35,35)
+      genMap.create()
 
+      var counter = 20
+      while(counter--){
+         genMap.placeMapTile(1,4)
+      }
+      genMap.walk(3, genMap.findMapTile(1), 30)
+      var map = genMap.getMap()
+      for(var i = 0 ; i < 35; i++){
+         for(var j = 0; j < 35;j++){
+            if((i===0 || j===0 || i===34 || j===34) && map[i][j] !== 3){
+               map[i][j] = 0 
+            }
+         }
+      }
+
+      Constants.MAP_OBJ = genMap
+      Constants.MAP = map 
+      H.GeneratorFunctions.generateEnding()
    })
 }

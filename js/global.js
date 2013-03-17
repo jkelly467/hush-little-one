@@ -2,16 +2,6 @@ if (!H){
    H = {}
 }
 
-// String.prototype.width = function(){
-//    var o = $('<div>'+this+'</div>')
-//             .css({'position':'absolute','float':'left','white-space':'nowrap', 'visibility':'hidden', 'font':'Gabriela 10px'})
-//             .appendTo($('body'))
-//    var w = o.width()
-//    o.remove()
-// 
-//    return w
-// }
-
 H.Global = function(){
 
    $(document).on('click','.item', function(){
@@ -40,14 +30,17 @@ H.Global = function(){
       changeScene: function(reset){
          Constants.ENEMY_POSITIONS = {}
          Constants.ITEM_POSITIONS = {}
-         if(reset){
-            clearInterval(Constants.DEATHINTERVAL)
-            H.Global.clearItemUi()
-            Crafty.scene("field")
-         }else{
+         $(Crafty.audio.sounds[Constants.CURRENT_SCENE+"Music"].obj).animate({volume:0},1000, 'swing', function(){
+            Crafty.audio.stop(Constants.CURRENT_SCENE+"Music")
             Constants.HERO.removeComponent('ViewportFollow')
-            Crafty.scene(Constants.NEXT_SCENE)
-         }
+            if(reset){
+               clearInterval(Constants.DEATHINTERVAL)
+               H.Global.clearItemUi()
+               Crafty.scene("field")
+            }else{
+               Crafty.scene(Constants.NEXT_SCENE)
+            }
+         })
       }
    }
 }()

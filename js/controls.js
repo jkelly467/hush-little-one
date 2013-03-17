@@ -47,7 +47,7 @@ H.Controls = function(){
                break
                case Crafty.keys['T']:
                   this._choosingAction = true
-                  this.speak('What should I say?\ns:Stay\nf:Follow\nc:Comfort')
+                  this.speak('What should I say?\ns:Stay\nf:Follow\nc:Comfort\nx:Nevermind')
                break
                case Crafty.keys["ENTER"]:
                   if(this._dead){
@@ -67,6 +67,12 @@ H.Controls = function(){
                   if(this._choosingAction){
                      Crafty.trigger("Turn", {moved:false, childMessage:ChildMessage.FOLLOW})
                      this.speak("Stay close, little one")
+                  }
+               break
+               case Crafty.keys["X"]:
+                  if(this._choosingAction){
+                     this._choosingAction = false
+                     this.clearSpeech()
                   }
                break
                case 191:

@@ -11,7 +11,7 @@ H.Components = {
       'Speaks',
       'Persist',
       'ViewportFollow'],
-   generateComponents: function(debug){
+   generateComponents: function(){
       H.Controls()
       H.Child()
 
@@ -353,17 +353,18 @@ H.Components = {
 
       H.addEnemies()
       H.addItems()
-      // if(debug){
-      //    H.addDebugTools()
-      // }
+   },
+   generateAudio: function(){
+     Crafty.audio.add('fieldMusic','audio/Ruhefeld.mp3') 
+     Crafty.audio.add('forestMusic','audio/Greyewood.mp3') 
+     Crafty.audio.add('mountainMusic','audio/Eldermountain.mp3') 
    },
    generateSprites: function(){
-      Crafty.sprite(32, assetify('tiles.png'),{
-         'enemy':[0,6],
-         'holydagger':[0,5],
-      })
       Crafty.sprite(32, assetify('bellofunsounding.png'),{
          'bellofunsounding':[0,0]
+      })
+      Crafty.sprite(32, assetify('holydagger.png'),{
+         'holydagger':[0,0]
       })
       Crafty.sprite(32, assetify('divineswiftness.png'),{
          'divineswiftness':[0,0]
@@ -379,6 +380,24 @@ H.Components = {
       })
       Crafty.sprite(32, assetify('warpstone.png'),{
          'passagestone':[0,0]
+      })
+      Crafty.sprite(32, assetify('Soldier.png'),{
+         'soldier':[0,0]
+      })
+      Crafty.sprite(32, assetify('Captain.png'),{
+         'captain':[0,0]
+      })
+      Crafty.sprite(32, assetify('Hellhound.png'),{
+         'hellhound':[0,0]
+      })
+      Crafty.sprite(32, assetify('Imp.png'),{
+         'imp':[0,0]
+      })
+      Crafty.sprite(32, assetify('Devil.png'),{
+         'devil':[0,0]
+      })
+      Crafty.sprite(32, assetify('Golem.png'),{
+         'golem':[0,0]
       })
       Crafty.sprite(32, assetify('Woman.png'),{
          'mother':[0,0]
@@ -427,6 +446,15 @@ H.Components = {
       })
       Crafty.sprite(32, assetify('Spring.png'),{
          'spring':[0,0]
+      })
+      Crafty.sprite(64, assetify('Danza.png'),{
+         'danza':[0,0]
+      })
+      Crafty.sprite(64, assetify('Cerberus.png'),{
+         'cerberus':[0,0]
+      })
+      Crafty.sprite(64, assetify('Abomination.png'),{
+         'abomination':[0,0]
       })
    }
 }

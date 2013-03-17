@@ -7,8 +7,6 @@ H.createEnemy = function(initial, speed, sightRadius, hearingRadius, rngStart, r
       return ROT.RNG.getRandom(rngEnd, rngStart) 
    }, null, 25)
 
-   sprite = sprite || 'enemy'
-
    return Crafty.e("2D, DOM, enemy, OnMap, Moves, Enemy, "+sprite)
    .attr({
       x: tile.x*32,
@@ -29,15 +27,12 @@ H.createBoss = function(type, x, y){
    Constants.ENEMY_POSITIONS['boss2'] = {x:x+1, y:y}
    Constants.ENEMY_POSITIONS['boss3'] = {x:x, y:y+1}
    Constants.ENEMY_POSITIONS['boss4'] = {x:x+1,y: y+1}
-   return Crafty.e("2D, DOM, OnMap, Boss, Color")
+   return Crafty.e("2D, DOM, OnMap, Boss,"+type)
       .attr({
          x: x*32,
          y: y*32,
-         w: 64,
-         h: 64,
          z: 8
       })
-      .color("#123456")
 }
 
 H.addEnemies = function(){
