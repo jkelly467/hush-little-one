@@ -25,6 +25,7 @@ H.createScenes = function(){
       })
 
       $('.active-area').on('click', function(){
+         if($('.ready').text() !== 'Click anywhere to begin') return
          $('.ready').text("Generating map...")
          Crafty.scene('field')
       })
