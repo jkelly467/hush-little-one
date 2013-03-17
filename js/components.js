@@ -355,9 +355,9 @@ H.Components = {
       H.addItems()
    },
    generateAudio: function(){
-     Crafty.audio.add('fieldMusic','audio/Ruhefeld.mp3') 
-     Crafty.audio.add('forestMusic','audio/Greyewood.mp3') 
-     Crafty.audio.add('mountainMusic','audio/Eldermountain.mp3') 
+     Crafty.audio.add('fieldMusic',['audio/Ruhefeld.ogg','audio/Ruhefeld.mp3']) 
+     Crafty.audio.add('forestMusic',['audio/Greyewood.ogg','audio/Greyewood.mp3']) 
+     Crafty.audio.add('mountainMusic',['audio/Eldermountain.ogg','audio/Eldermountain.mp3']) 
    },
    generateSprites: function(){
       Crafty.sprite(32, assetify('bellofunsounding.png'),{

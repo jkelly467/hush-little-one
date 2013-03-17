@@ -59,8 +59,8 @@ html {
 }
 .opening-screen .ready {
   position: absolute;
-  bottom: 550px;
-  right: 440px;
+  bottom: 44%;
+  right: 43%;
 }
 .opening-screen .credits {
   position: absolute;
